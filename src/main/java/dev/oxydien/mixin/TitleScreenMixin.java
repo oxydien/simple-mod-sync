@@ -39,8 +39,10 @@ public class TitleScreenMixin extends Screen implements ProgressCallback {
 
 	@Inject(at = @At("RETURN"), method = "init")
 	private void simple_mod_sync$init(CallbackInfo ci) {
-        SimpleBackgroundWidget simple_mod_sync$background = new SimpleBackgroundWidget(0, 3, 100, 40, 0);
-		simple_mod_sync$progressText = new MultilineTextWidget(5, 5, Text.literal("HELICOPTER"), this.textRenderer).setMaxWidth(90).setMaxRows(2);
+        SimpleBackgroundWidget simple_mod_sync$background = new SimpleBackgroundWidget(0, 4, 100, 40, 0);
+		simple_mod_sync$progressText =
+				new MultilineTextWidget(5, 5, Text.translatable("simple_mod_sync.ui.initializing"), this.textRenderer)
+						.setMaxWidth(160).setMaxRows(2);
 		simple_mod_sync$progressBar = new SimpleBackgroundWidget(0, 0, 0, 2, 0xFFFFFFFF);
 
 		this.addDrawableChild(simple_mod_sync$background);
@@ -65,13 +67,20 @@ public class TitleScreenMixin extends Screen implements ProgressCallback {
 				}
 			}
 
-			simple_mod_sync$progressText.setMessage(Text.literal("ERROR: " + errorType));
+			simple_mod_sync$progressText.setMessage(Text.translatable("simple_mod_sync.ui.error." + errorType.toString().toLowerCase()));
+			simple_mod_sync$progressText.setTextColor(0xFFFF0000);
+			simple_mod_sync$progressBar.setColor(0xFFFF0000);
 			return;
-		} else if (state == SyncState.DOWNLOADING) {
-			simple_mod_sync$progressText.setMessage(Text.literal(String.format("Downloading %s...", SimpleModSync.worker.GetProgress())));
-			return;
-		}
+		} else {
+			simple_mod_sync$progressText.setTextColor(0xFFFFFFFF);
+			simple_mod_sync$progressBar.setColor(0xFFFFFFFF);
 
-		simple_mod_sync$progressText.setMessage(Text.literal(state.toString()));
+			if (state == SyncState.DOWNLOADING) {
+				simple_mod_sync$progressText.setMessage(Text.translatable("simple_mod_sync.ui.downloading", SimpleModSync.worker.GetProgress()));
+				return;
+			}
+
+			simple_mod_sync$progressText.setMessage(Text.translatable("simple_mod_sync.ui." + state.toString().toLowerCase()));
+		}
 	}
 }

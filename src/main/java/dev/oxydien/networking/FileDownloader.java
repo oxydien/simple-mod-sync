@@ -1,4 +1,4 @@
-package dev.oxydien.Networking;
+package dev.oxydien.networking;
 
 import java.io.BufferedReader;
 import java.io.IOException;

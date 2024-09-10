@@ -1,0 +1,19 @@
+{
+  "simple_mod_sync.ui.set_sync_remote_screen_title": "§lSimple Mod Sync",
+  "simple_mod_sync.ui.set_sync_remote_screen_subtitle": "§oNastavit adresu serveru",
+  "simple_mod_sync.ui.set_sync_remote_button": "Potvrdit",
+  "simple_mod_sync.ui.cancel_sync_button": "Zrušit",
+  "simple_mod_sync.ui.initializing": "Inicializace",
+  "simple_mod_sync.ui.checking_remote": "Kontroluji server",
+  "simple_mod_sync.ui.parsing_remote": "Čtení dat ze serveru",
+  "simple_mod_sync.ui.downloading": "Stahování %d%%...",
+  "simple_mod_sync.ui.ready": "Připraveno k hraní",
+  "simple_mod_sync.ui.needs_restart": "Restartujte hru",
+  "simple_mod_sync.ui.error": "Chyba",
+  "simple_mod_sync.ui.error.unknown": "Neznámá chyba",
+  "simple_mod_sync.ui.error.remote_not_set": "Adresa serveru není nastavena\nNastavte ji v config souboru",
+  "simple_mod_sync.ui.error.remote_not_found": "Adresa serveru nenalezena\nNepodařilo se připojit k serveru",
+  "simple_mod_sync.ui.error.parsing_failed": "Nepodařilo se přečíst data ze serveru",
+  "simple_mod_sync.ui.error.download_failed": "Nepodařilo se stáhnout mody",
+  "simple_mod_sync.ui.error.failed_to_write_file": "Nepodařilo se zapsat mody na disk"
+}

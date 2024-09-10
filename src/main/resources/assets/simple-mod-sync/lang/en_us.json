@@ -1,5 +1,19 @@
 {
-  "simple_mod_sync.ui.set_sync_remote": "Set Sync Remote",
+  "simple_mod_sync.ui.set_sync_remote_screen_title": "§lSimple Mod Sync",
+  "simple_mod_sync.ui.set_sync_remote_screen_subtitle": "§oSet the remote URL",
   "simple_mod_sync.ui.set_sync_remote_button": "Confirm",
-  "simple_mod_sync.ui.cancel_sync_button": "Cancel"
+  "simple_mod_sync.ui.cancel_sync_button": "Cancel",
+  "simple_mod_sync.ui.initializing": "Initializing",
+  "simple_mod_sync.ui.checking_remote": "Checking remote",
+  "simple_mod_sync.ui.parsing_remote": "Reading remote data",
+  "simple_mod_sync.ui.downloading": "Downloading %d%%...",
+  "simple_mod_sync.ui.ready": "Ready to play",
+  "simple_mod_sync.ui.needs_restart": "Restart your game",
+  "simple_mod_sync.ui.error": "Error",
+  "simple_mod_sync.ui.error.unknown": "Unknown error",
+  "simple_mod_sync.ui.error.remote_not_set": "Remote URL not set\nSet it in the config file",
+  "simple_mod_sync.ui.error.remote_not_found": "Remote URL not found\nCould not connect to the server",
+  "simple_mod_sync.ui.error.parsing_failed": "Failed to parse remote data",
+  "simple_mod_sync.ui.error.download_failed": "Failed to download mods",
+  "simple_mod_sync.ui.error.failed_to_write_file": "Failed to write mods to disk"
 }

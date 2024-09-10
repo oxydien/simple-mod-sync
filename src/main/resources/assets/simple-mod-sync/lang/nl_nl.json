@@ -1,0 +1,19 @@
+{
+  "simple_mod_sync.ui.set_sync_remote_screen_title": "§lSimple Mod Sync",
+  "simple_mod_sync.ui.set_sync_remote_screen_subtitle": "§oStel het serveradres in",
+  "simple_mod_sync.ui.set_sync_remote_button": "Bevestigen",
+  "simple_mod_sync.ui.cancel_sync_button": "Annuleren",
+  "simple_mod_sync.ui.initializing": "Initialiseren",
+  "simple_mod_sync.ui.checking_remote": "De server controleren",
+  "simple_mod_sync.ui.parsing_remote": "Gegevens van de server lezen",
+  "simple_mod_sync.ui.downloading": "Downloaden %d%%...",
+  "simple_mod_sync.ui.ready": "Klaar om te spelen",
+  "simple_mod_sync.ui.needs_restart": "Herstart je spel",
+  "simple_mod_sync.ui.error": "Fout",
+  "simple_mod_sync.ui.error.unknown": "Onbekende fout",
+  "simple_mod_sync.ui.error.remote_not_set": "Serveradres is niet ingesteld\nStel het in in het configuratiebestand",
+  "simple_mod_sync.ui.error.remote_not_found": "Serveradres niet gevonden\nVerbinding met server mislukt",
+  "simple_mod_sync.ui.error.parsing_failed": "Mislukt bij het lezen van gegevens van de server",
+  "simple_mod_sync.ui.error.download_failed": "Downloaden van mods mislukt",
+  "simple_mod_sync.ui.error.failed_to_write_file": "Mislukt bij het schrijven van mods naar schijf"
+}

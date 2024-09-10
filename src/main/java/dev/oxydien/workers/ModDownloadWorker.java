@@ -3,7 +3,7 @@ package dev.oxydien.workers;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import dev.oxydien.Networking.FileDownloader;
+import dev.oxydien.networking.FileDownloader;
 import dev.oxydien.SimpleModSync;
 import dev.oxydien.config.Config;
 import dev.oxydien.data.ProgressCallback;
@@ -40,7 +40,7 @@ public class ModDownloadWorker implements Runnable {
     public int GetProgress() {
         return this.progress;
     }
-
+;
     public ModDownloadWorker() {
         this.state = SyncState.INITIALIZING;
         this.errorType = SyncErrorType.NONE;
@@ -74,7 +74,7 @@ public class ModDownloadWorker implements Runnable {
         }
 
         if (url.equals("-")) {
-            this.progress = -1;
+            this.progress = 100;
             this.setState(SyncState.READY);
             this.errorType = SyncErrorType.REMOTE_NOT_SET;
             SimpleModSync.LOGGER.info("[SMS-WORKER] Synchronization disabled, returning early");
@@ -162,7 +162,7 @@ public class ModDownloadWorker implements Runnable {
 
             changed = true;
             this.progress = 10 + (int) ((index * 90.0) / total);
-            SimpleModSync.LOGGER.info("[SMS-WORKER] ({}/{}) Downloaded {} {}", index, total, content.getModName(), content.getVersion());
+            SimpleModSync.LOGGER.info("[SMS-WORKER] ({}/{}) Successfully Downloaded {} {}", index, total, content.getModName(), content.getVersion());
         }
 
         this.progress = 100;
@@ -185,6 +185,7 @@ public class ModDownloadWorker implements Runnable {
 
     public void start() {
         Thread thread = new Thread(this);
+        this.workerThread.set(thread);
         thread.start();
     }
 
