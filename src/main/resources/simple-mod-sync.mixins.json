@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "dev.oxydien.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"TitleScreenMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
