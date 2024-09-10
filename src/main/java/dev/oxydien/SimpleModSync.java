@@ -30,7 +30,6 @@ public class SimpleModSync implements ModInitializer {
 
 	public static void StartWorker() {
 		worker = new ModDownloadWorker();
-		Thread thread = new Thread(worker);
-		thread.start();
+		worker.start();
 	}
 }

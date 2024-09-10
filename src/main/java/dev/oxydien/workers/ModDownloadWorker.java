@@ -20,12 +20,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ModDownloadWorker implements Runnable {
     private SyncState state;
     private SyncErrorType errorType;
     private int progress;
-    private List<ProgressCallback> progressCallback;
+    public static List<ProgressCallback> callbacks = new ArrayList<>();
+    private final AtomicReference<Thread> workerThread;
 
     public SyncState GetState() {
         return this.state;
@@ -42,56 +44,57 @@ public class ModDownloadWorker implements Runnable {
     public ModDownloadWorker() {
         this.state = SyncState.INITIALIZING;
         this.errorType = SyncErrorType.NONE;
-        this.progressCallback = new ArrayList<>();
+        this.workerThread = new AtomicReference<>();
     }
 
-    public void Subscribe(ProgressCallback callback) {
-        if (!this.progressCallback.contains(callback)) {
-            this.progressCallback.add(callback);
-            SimpleModSync.LOGGER.info("[SMS-WORKER] Added callback {}", callback);
+    public void subscribe(ProgressCallback callback) {
+        if (callback != null && !callbacks.contains(callback)) {
+            callbacks.add(callback);
+            //SimpleModSync.LOGGER.info("[SMS-WORKER] Added callback {} {}", callback, callbacks);
         }
     }
 
-    public void Unsubscribe(ProgressCallback callback) {
-        this.progressCallback.remove(callback);
-        SimpleModSync.LOGGER.info("[SMS-WORKER] Removed callback {}", callback);
+    public void unsubscribe(ProgressCallback callback) {
+        if (callback != null) {
+            callbacks.remove(callback);
+        }
     }
 
     @Override
     public void run() {
+        workerThread.set(Thread.currentThread());
         SimpleModSync.LOGGER.info("[SMS-WORKER] Mod download worker started");
 
         String url = Config.instance.getDownloadUrl();
         if (url.isEmpty()) {
             this.errorType = SyncErrorType.REMOTE_NOT_SET;
-            this.SetState(SyncState.ERROR);
+            this.setState(SyncState.ERROR);
             SimpleModSync.LOGGER.info("[SMS-WORKER] Remote URL not set");
             return;
         }
 
-        // If url is disabled
         if (url.equals("-")) {
             this.progress = -1;
-            this.SetState(SyncState.READY);
+            this.setState(SyncState.READY);
             this.errorType = SyncErrorType.REMOTE_NOT_SET;
             SimpleModSync.LOGGER.info("[SMS-WORKER] Synchronization disabled, returning early");
             return;
         }
 
         this.progress = 2;
-        this.SetState(SyncState.CHECKING_REMOTE);
-        String jsonString = "";
+        this.setState(SyncState.CHECKING_REMOTE);
+        String jsonString;
         try {
             jsonString = FileDownloader.downloadString(url);
         } catch (IOException e) {
             this.errorType = SyncErrorType.REMOTE_NOT_FOUND;
-            this.SetState(SyncState.ERROR);
+            this.setState(SyncState.ERROR);
             SimpleModSync.LOGGER.error("[SMS-WORKER] Remote URL not found", e);
             return;
         }
 
         this.progress = 4;
-        this.SetState(SyncState.PARSING_REMOTE);
+        this.setState(SyncState.PARSING_REMOTE);
         SyncData data;
         try {
             JsonElement jsonElement = JsonParser.parseString(jsonString);
@@ -113,13 +116,13 @@ public class ModDownloadWorker implements Runnable {
             data = new SyncData(syncVersion, contentList);
         } catch (Exception e) {
             this.errorType = SyncErrorType.PARSING_FAILED;
-            this.SetState(SyncState.ERROR);
+            this.setState(SyncState.ERROR);
             SimpleModSync.LOGGER.error("[SMS-WORKER] Failed to parse remote data", e);
             return;
         }
 
         this.progress = 10;
-        this.SetState(SyncState.DOWNLOADING);
+        this.setState(SyncState.DOWNLOADING);
         boolean changed = false;
         int index = 0;
         int total = data.getContent().size();
@@ -129,16 +132,14 @@ public class ModDownloadWorker implements Runnable {
                     StringUtils.removeUnwantedCharacters(content.getModName()) + "-" +
                     StringUtils.removeUnwantedCharacters(content.getVersion()) +
                     ".jar";
-            this.SetState(SyncState.DOWNLOADING);
+            this.setState(SyncState.DOWNLOADING);
 
-            // If same file exists, skip
             if (FileDownloader.fileExists(path)) {
                 SimpleModSync.LOGGER.info("[SMS-WORKER] ({}/{}) File already exists, skipping {}", index, total, content.getModName());
                 this.progress = 10 + (int) ((index * 90.0) / total);
                 continue;
             }
 
-            // If older version exists, delete
             Path olderVersion = PathUtils.PathExistsFromStartInDir(Config.instance.getDownloadDestination(), content.getModName());
             if (olderVersion != null) {
                 SimpleModSync.LOGGER.info("[SMS-WORKER] ({}/{}) Found older version, deleting {}", index, total, olderVersion.getFileName());
@@ -149,13 +150,12 @@ public class ModDownloadWorker implements Runnable {
                 }
             }
 
-            // Download new version
             SimpleModSync.LOGGER.info("[SMS-WORKER] ({}/{}) Downloading {} {}", index, total, content.getModName(), content.getVersion());
             try {
                 FileDownloader.downloadFile(content.getUrl(), path);
             } catch (IOException e) {
                 this.errorType = SyncErrorType.DOWNLOAD_FAILED;
-                this.SetState(SyncState.ERROR);
+                this.setState(SyncState.ERROR);
                 SimpleModSync.LOGGER.error("[SMS-WORKER] Failed to download file", e);
                 continue;
             }
@@ -167,20 +167,31 @@ public class ModDownloadWorker implements Runnable {
 
         this.progress = 100;
         if (changed) {
-            this.SetState(SyncState.NEEDS_RESTART);
+            this.setState(SyncState.NEEDS_RESTART);
         } else {
-            this.SetState(SyncState.READY);
+            this.setState(SyncState.READY);
         }
 
         SimpleModSync.LOGGER.info("[SMS-WORKER] Synchronization finished");
     }
 
-    private void SetState(SyncState state) {
+    private void setState(SyncState state) {
         this.state = state;
-
-        //SimpleModSync.LOGGER.info("[SMS-WORKER] Calling UPDATE callback {}", this.progressCallback);
-        for (ProgressCallback progressCallback : this.progressCallback) {
+        //SimpleModSync.LOGGER.info("[SMS-WORKER] Calling UPDATE callback {}", callbacks);
+        for (ProgressCallback progressCallback : callbacks) {
             progressCallback.simple_mod_sync$onProgressUpdate(CallbackReason.UPDATE);
+        }
+    }
+
+    public void start() {
+        Thread thread = new Thread(this);
+        thread.start();
+    }
+
+    public void stop() {
+        Thread thread = workerThread.get();
+        if (thread != null) {
+            thread.interrupt();
         }
     }
 }
