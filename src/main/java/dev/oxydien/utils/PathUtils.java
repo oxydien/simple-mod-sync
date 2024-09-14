@@ -25,4 +25,16 @@ public class PathUtils {
         }
         return null;
     }
+
+    public static boolean PathExists(String path) {
+        return Files.exists(Path.of(path));
+    }
+
+    public static void CreateFolder(String path) {
+        try {
+            Files.createDirectories(Path.of(path));
+        } catch (IOException e) {
+            SimpleModSync.LOGGER.error("Error while creating folder", e);
+        }
+    }
 }

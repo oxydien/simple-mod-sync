@@ -14,17 +14,18 @@ The file retrieved from the URL must follow this structure:
 
 ```json
 {
-  "sync_version": 1,
+  "sync_version": 2,
   "content": [
     {
       "url": "https://example.com/url/to/mod.jar",
-      "mod_name": "mod",
-      "version": "2.8.1"
+      "mod_name": "some-mod_name",
+      "version": "2.8.1",
+      "type": "mod"
     }
   ]
 }
 ```
-> Add more mods as needed to the content array.
+> Add more mods/files as needed to the content array.
 
 ## Simple Setup Guide
 

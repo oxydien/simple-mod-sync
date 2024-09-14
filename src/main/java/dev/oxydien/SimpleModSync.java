@@ -23,13 +23,20 @@ public class SimpleModSync implements ModInitializer {
 		LOGGER.info("Simple Mod Sync is starting up...");
 		FabricLoader loader = FabricLoader.getInstance();
 		String configPath = loader.getConfigDir() + "/" + MOD_ID + ".json";
-		String modsPath = loader.getGameDir() + "/mods";
-		new Config(configPath, modsPath);
-		SimpleModSync.StartWorker();
+		String destPath = loader.getGameDir().toString();
+		new Config(configPath, destPath);
+
+		worker = new ModDownloadWorker();
+		if (Config.instance.getAutoDownload()) {
+			SimpleModSync.StartWorker();
+		}
 	}
 
 	public static void StartWorker() {
-		worker = new ModDownloadWorker();
+		if (worker.GetProgress() != 0 && worker.GetProgress() != 100) {
+			LOGGER.info("Worker already started {}", worker.GetProgress());
+			return;
+		}
 		worker.start();
 	}
 }

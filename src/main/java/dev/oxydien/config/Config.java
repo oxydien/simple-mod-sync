@@ -7,11 +7,10 @@ import dev.oxydien.SimpleModSync;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
-import java.lang.ref.WeakReference;
-import java.util.Optional;
 
 public class Config {
-    private String path;
+    private final String path;
+    private boolean autoDownload;
     private String downloadUrl;
     private String downloadDestination;
     public static Config instance;
@@ -19,6 +18,7 @@ public class Config {
 
     public Config(String path, @Nullable String downloadDestination) {
         this.path = path;
+        this.autoDownload = true;
         this.downloadUrl = "";
         this.downloadDestination = downloadDestination;
         this.load();
@@ -29,11 +29,19 @@ public class Config {
     }
 
     public String getPath() {
-        return path;
+        return this.path;
+    }
+
+    public boolean getAutoDownload() {
+        return this.autoDownload;
     }
 
     public String getDownloadUrl() {
-        return downloadUrl;
+        return this.downloadUrl;
+    }
+
+    public String getDownloadDestination(String type) {
+        return this.getDownloadDestination() + "/" + type;
     }
 
     public void setDownloadUrl(String downloadUrl) {
@@ -42,7 +50,7 @@ public class Config {
     }
 
     public String getDownloadDestination() {
-        return downloadDestination;
+        return this.downloadDestination;
     }
 
     // Deserialize from json file
@@ -66,14 +74,25 @@ public class Config {
         // Parse json
         JsonElement jsonElement = JsonParser.parseString(content.toString());
 
-        this.downloadUrl = jsonElement.getAsJsonObject().get("download_url").getAsString();
-        this.downloadDestination = jsonElement.getAsJsonObject().get("download_destination").getAsString();
+        this.autoDownload = jsonElement.getAsJsonObject().get("auto_download") == null ||
+                jsonElement.getAsJsonObject().get("auto_download").getAsBoolean();
+
+        var downloadUrl = jsonElement.getAsJsonObject().get("download_url");
+        if (downloadUrl != null && !downloadUrl.getAsString().isEmpty()) {
+            this.downloadUrl = downloadUrl.getAsString();
+        }
+
+        var downloadDestination = jsonElement.getAsJsonObject().get("download_destination");
+        if (downloadDestination != null && downloadDestination.getAsString().isEmpty()) {
+            this.downloadDestination = downloadDestination.getAsString();
+        }
     }
 
     // Serialize to json file
     public void save() {
         // Create json
         JsonObject json = new JsonObject();
+        json.addProperty("auto_download", this.autoDownload);
         json.addProperty("download_url", this.downloadUrl);
         json.addProperty("download_destination", this.downloadDestination);
 

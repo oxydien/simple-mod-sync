@@ -3,8 +3,8 @@ package dev.oxydien.ui.widget;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.EmptyWidget;
 import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.client.render.RenderLayer;
 
 import java.util.function.Consumer;
 
@@ -17,12 +17,14 @@ public class SimpleBackgroundWidget implements Widget, Drawable, Element, Select
 
     public SimpleBackgroundWidget(int x, int y, int width, int height, int color) {
         this.setPosition(x, y);
-        this.color = (color == 0) ? 0xF5000000 : color;
+        this.color = (color == 0) ? 0xa0000000 : color;
+        this.width = width;
+        this.height = height;
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        context.fill(this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), this.color);
+        context.fill(RenderLayer.getGuiOverlay(), this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), this.color);
     }
 
     @Override

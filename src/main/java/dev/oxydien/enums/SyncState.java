@@ -6,6 +6,7 @@ public enum SyncState {
     PARSING_REMOTE,
     DOWNLOADING,
     READY,
+    DID_NOT_SYNC,
     NEEDS_RESTART,
     ERROR
 }
