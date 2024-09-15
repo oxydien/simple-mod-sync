@@ -37,6 +37,7 @@ public class SetSyncRemoteScreen extends Screen {
 
         // URL field widget
         TextFieldWidget remote_url = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, this.height / 2 + 20, 200, 20, Text.literal(""));
+        remote_url.setMaxLength(368);
         this.addDrawableChild(remote_url);
 
         // Auto download toggle button widget

@@ -17,6 +17,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -66,6 +67,7 @@ public class SyncFullViewScreen extends Screen implements ProgressCallback {
         // Url field
         TextFieldWidget urlField = new TextFieldWidget(this.textRenderer, this.width / 2 - 150, 24,
                 300, 20, Text.literal(""));
+        urlField.setMaxLength(368);
         urlField.setText(Config.instance.getDownloadUrl());
         this.addDrawableChild(urlField);
 
@@ -112,8 +114,10 @@ public class SyncFullViewScreen extends Screen implements ProgressCallback {
         super.render(context, mouseX, mouseY, delta);
 
         int index = 0;
-        for (ContentSyncProgressWidget widget : progress.values().stream()
-                .sorted(Comparator.comparingInt(w -> w.getProgress() == 0 ? Integer.MAX_VALUE : w.getProgress())).toList()) {
+        List<ContentSyncProgressWidget> sortedWidgets = new ArrayList<>(progress.values());
+        sortedWidgets.sort(Comparator.comparingInt(w -> w != null && w.getProgress() == 0 ? Integer.MAX_VALUE : w != null ? w.getProgress() : Integer.MAX_VALUE));
+        for (ContentSyncProgressWidget widget : sortedWidgets) {
+            if (widget == null) continue;
             if (index >= page * pageSize && index < (page + 1) * pageSize) {
                 widget.setPosition(this.width / 2 - widget.getWidth() / 2,
                         70 + (index - page * pageSize) * widget.getHeight() + (index - page * pageSize) * 3);
@@ -140,7 +144,9 @@ public class SyncFullViewScreen extends Screen implements ProgressCallback {
             }
 
             ContentSyncProgressWidget widget = progress.get(content.getIndex());
-            widget.setProgress(modProgress);
+            if (widget != null) {
+                widget.setProgress(modProgress);
+            }
         }
     }
 }

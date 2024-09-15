@@ -3,18 +3,21 @@ package dev.oxydien.data;
 import dev.oxydien.enums.ContentSyncOutcome;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+
 public class ContentSyncProgress {
 
     private final int index;
-    private int progress;
-    private ContentSyncOutcome outcome;
-    private Exception exception;
+    private final AtomicInteger progress;
+    private AtomicReference<ContentSyncOutcome> outcome;
+    private AtomicReference<Exception> exception;
 
     public ContentSyncProgress(int index, int progress) {
         this.index = index;
-        this.progress = progress;
-        this.outcome = ContentSyncOutcome.IN_PROGRESS;
-        this.exception = null;
+        this.progress = new AtomicInteger(progress);
+        this.outcome = new AtomicReference<>(ContentSyncOutcome.IN_PROGRESS);
+        this.exception = new AtomicReference<>(null);
     }
 
     public int getIndex() {
@@ -22,28 +25,29 @@ public class ContentSyncProgress {
     }
 
     public int getProgress() {
-        return this.progress;
+        return this.progress.get();
     }
 
     public ContentSyncOutcome getOutcome() {
-        return this.outcome;
+        return this.outcome.get();
     }
 
     public Exception getException() {
-        return this.exception;
+        return this.exception.get();
     }
 
     public void setProgress(int progress) {
-        this.progress = progress;
+        this.progress.set(progress);
     }
 
     public void setOutcome(ContentSyncOutcome outcome, @Nullable Exception exception) {
-        this.outcome = outcome;
-        this.exception = exception;
+        this.outcome.set(outcome);
+        this.exception.set(exception);
     }
 
     public boolean isError() {
-        return this.outcome == ContentSyncOutcome.INVALID_URL || this.outcome == ContentSyncOutcome.DOWNLOAD_INTERRUPTED ||
-                this.outcome == ContentSyncOutcome.ALREADY_EXISTS;
+        var outcome = this.getOutcome();
+        return outcome == ContentSyncOutcome.INVALID_URL || outcome == ContentSyncOutcome.DOWNLOAD_INTERRUPTED ||
+                outcome == ContentSyncOutcome.ALREADY_EXISTS;
     }
 }

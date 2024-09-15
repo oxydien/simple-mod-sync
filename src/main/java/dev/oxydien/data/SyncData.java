@@ -2,6 +2,7 @@ package dev.oxydien.data;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 
 public class SyncData {
@@ -18,7 +19,7 @@ public class SyncData {
     }
 
     public List<Content> getContent() {
-        return content;
+        return Collections.unmodifiableList(this.content);
     }
 
     public static class Content {

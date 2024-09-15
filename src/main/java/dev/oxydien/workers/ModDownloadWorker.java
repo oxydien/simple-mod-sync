@@ -33,7 +33,7 @@ public class ModDownloadWorker implements Runnable {
     @Nullable private SyncData syncData;
     private SyncErrorType errorType;
     private final AtomicInteger overallProgress;
-    public static List<ProgressCallback> callbacks = new ArrayList<>();
+    public static List<ProgressCallback> callbacks = new CopyOnWriteArrayList<>();
     private final AtomicReference<Thread> workerThread;
     private final AtomicReference<List<ContentSyncProgress>> modProgress;
     private CompletionService<Boolean> completionService;
@@ -65,8 +65,8 @@ public class ModDownloadWorker implements Runnable {
         this.errorType = SyncErrorType.NONE;
         this.workerThread = new AtomicReference<>();
         this.overallProgress = new AtomicInteger(0);
-        this.modProgress = new AtomicReference<>(new ArrayList<>());
-        this.executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        this.modProgress = new AtomicReference<>(new CopyOnWriteArrayList<>());
+        this.executorService = Executors.newFixedThreadPool(Math.min(Runtime.getRuntime().availableProcessors(), 4));
         this.completionService = new ExecutorCompletionService<>(this.executorService);
     }
 
@@ -145,10 +145,12 @@ public class ModDownloadWorker implements Runnable {
                 changed |= future.get();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                SimpleModSync.LOGGER.error("[SMS-WORKER] Download process was interrupted", e);
+                SimpleModSync.LOGGER.error("[SMS-WORKER] Download process was interrupted for {}",
+                        this.syncData.getContent().get(i).getModName(), e);
                 break;
             } catch (ExecutionException e) {
-                SimpleModSync.LOGGER.error("[SMS-WORKER] Error during parallel download", e);
+                SimpleModSync.LOGGER.error("[SMS-WORKER] Error during parallel download for {}",
+                        this.syncData.getContent().get(i).getModName(), e);
             }
         }
 
@@ -202,7 +204,7 @@ public class ModDownloadWorker implements Runnable {
 
         Path olderVersion = PathUtils.PathExistsFromStartInDir(Config.instance.getDownloadDestination(), content.getModName());
         if (olderVersion != null) {
-            SimpleModSync.LOGGER.info("[SMS-WORKER] Found older version, deleting {}", olderVersion.getFileName());
+            SimpleModSync.LOGGER.info("[SMS-WORKER] Found older version of {}, deleting {}", content.getModName(), olderVersion.getFileName());
             try {
                 Files.delete(olderVersion);
             } catch (IOException e) {
@@ -215,11 +217,11 @@ public class ModDownloadWorker implements Runnable {
             FileDownloader.downloadFileWithProgress(content.getUrl(), path,
                     (progress) -> this.updateModProgress(content.getIndex(), progress, ContentSyncOutcome.IN_PROGRESS, null));
         } catch (IOException e) {
-            SimpleModSync.LOGGER.error("[SMS-WORKER] Failed to download file", e);
+            SimpleModSync.LOGGER.error("[SMS-WORKER] Failed to download file {}", content.getModName(), e);
             this.updateModProgress(content.getIndex(), 100, ContentSyncOutcome.DOWNLOAD_INTERRUPTED , e);
             return false;
         } catch (URISyntaxException e) {
-            SimpleModSync.LOGGER.error("[SMS-WORKER] Failed to download file", e);
+            SimpleModSync.LOGGER.error("[SMS-WORKER] Failed to download file {}", content.getModName(), e);
             this.updateModProgress(content.getIndex(), 100, ContentSyncOutcome.INVALID_URL , e);
             return false;
         }
@@ -308,10 +310,10 @@ public class ModDownloadWorker implements Runnable {
     public void start() {
         Thread thread = new Thread(this);
         this.syncData = null;
-        this.modProgress.set(new ArrayList<>());
+        this.modProgress.set(new CopyOnWriteArrayList<>());
         this.overallProgress.set(0);
         this.errorType = null;
-        this.executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        this.executorService = Executors.newFixedThreadPool(Math.min(Runtime.getRuntime().availableProcessors(), 4));
         this.completionService = new ExecutorCompletionService<>(this.executorService);
         this.setState(SyncState.INITIALIZING);
         this.workerThread.set(thread);
