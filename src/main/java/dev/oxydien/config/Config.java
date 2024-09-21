@@ -3,7 +3,7 @@ package dev.oxydien.config;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import dev.oxydien.SimpleModSync;
+import dev.oxydien.logger.Log;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
@@ -25,7 +25,7 @@ public class Config {
         this.save();
         instance = this;
 
-        SimpleModSync.LOGGER.info("Config file loaded");
+        Log.Log.debug("Config file loaded");
     }
 
     public String getPath() {
@@ -64,10 +64,10 @@ public class Config {
                 content.append(line);
             }
         } catch (FileNotFoundException e) {
-            SimpleModSync.LOGGER.warn("Config file not found, creating a default one", e);
+            Log.Log.warn("config.load", "Config file not found, creating a default one", e);
             return;
         } catch (IOException e) {
-            SimpleModSync.LOGGER.error("Failed to read config file", e);
+            Log.Log.error("config.load.IOException", "Failed to read config file", e);
             return;
         }
 
@@ -100,7 +100,7 @@ public class Config {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(this.getPath()))) {
             bw.write(json.toString());
         } catch (IOException e) {
-            SimpleModSync.LOGGER.error("Failed to write config file", e);
+            Log.Log.error("config.save.IOException", "Failed to write config file", e);
         }
     }
 }

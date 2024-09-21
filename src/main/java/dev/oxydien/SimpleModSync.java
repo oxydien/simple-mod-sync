@@ -1,26 +1,21 @@
 package dev.oxydien;
 
 import dev.oxydien.config.Config;
+import dev.oxydien.logger.Log;
 import dev.oxydien.workers.ModDownloadWorker;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.loader.api.FabricLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SimpleModSync implements ModInitializer {
 	public static final String MOD_ID = "simple-mod-sync";
-
-	// This logger is used to write text to the console and the log file.
-	// It is considered best practice to use your mod id as the logger's name.
-	// That way, it's clear which mod wrote info, warnings, and errors.
-	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	public static ModDownloadWorker worker;
 
 	@Override
 	public void onInitialize() {
-		LOGGER.info("Simple Mod Sync is starting up...");
+		new Log(MOD_ID, true);
+		Log.Log.info("Simple Mod Sync is starting up...");
 		FabricLoader loader = FabricLoader.getInstance();
 		String configPath = loader.getConfigDir() + "/" + MOD_ID + ".json";
 		String destPath = loader.getGameDir().toString();
@@ -34,7 +29,7 @@ public class SimpleModSync implements ModInitializer {
 
 	public static void StartWorker() {
 		if (worker.GetProgress() != 0 && worker.GetProgress() != 100) {
-			LOGGER.info("Worker already started {}", worker.GetProgress());
+			Log.Log.debug("start-worker", "Worker already started {}", worker.GetProgress());
 			return;
 		}
 		worker.start();

@@ -1,6 +1,6 @@
 package dev.oxydien.utils;
 
-import dev.oxydien.SimpleModSync;
+import dev.oxydien.logger.Log;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ public class PathUtils {
                     }
                 }
             } catch (IOException e) {
-                SimpleModSync.LOGGER.error("Error while searching for file in directory", e);
+                Log.Log.error("path-utils.pefsid.IOException", "Error while searching for file in directory", e);
             }
         }
         return null;
@@ -34,7 +34,7 @@ public class PathUtils {
         try {
             Files.createDirectories(Path.of(path));
         } catch (IOException e) {
-            SimpleModSync.LOGGER.error("Error while creating folder", e);
+            Log.Log.error("path-utils.create-folder.IOException", "Error while creating folder", e);
         }
     }
 }

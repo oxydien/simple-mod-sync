@@ -37,7 +37,7 @@ The file retrieved from the URL must follow this structure:
 
 4. **Monitor Synchronization**: Once the URL is set, the mod synchronization status will be visible in the top-left corner of the title screen.
 
-- To change the URL later, simply update the `download_url` setting in the config file.
+- To change the URL later, simply update the `download_url` setting in the config file or in the synced mods menu.
 
 ## For Developers
 

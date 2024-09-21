@@ -5,8 +5,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dev.oxydien.data.ContentSyncProgress;
 import dev.oxydien.enums.ContentSyncOutcome;
+import dev.oxydien.logger.Log;
 import dev.oxydien.networking.FileDownloader;
-import dev.oxydien.SimpleModSync;
 import dev.oxydien.config.Config;
 import dev.oxydien.data.ProgressCallback;
 import dev.oxydien.data.SyncData;
@@ -95,7 +95,7 @@ public class ModDownloadWorker implements Runnable {
     @Override
     public void run() {
         workerThread.set(Thread.currentThread());
-        SimpleModSync.LOGGER.info("[SMS-WORKER] Mod download worker started");
+        Log.Log.info("bw.run", "Mod download worker started");
 
         String url = Config.instance.getDownloadUrl();
         if (url.isEmpty()) {
@@ -107,7 +107,7 @@ public class ModDownloadWorker implements Runnable {
             this.overallProgress.set(100);
             this.errorType = SyncErrorType.REMOTE_NOT_SET;
             this.setState(SyncState.READY);
-            SimpleModSync.LOGGER.info("[SMS-WORKER] Synchronization disabled, returning early");
+            Log.Log.info("bw.run", "Synchronization disabled, returning early");
             return;
         }
 
@@ -145,11 +145,11 @@ public class ModDownloadWorker implements Runnable {
                 changed |= future.get();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                SimpleModSync.LOGGER.error("[SMS-WORKER] Download process was interrupted for {}",
+                Log.Log.error("bw.run.interruptException", "Download process was interrupted for {}",
                         this.syncData.getContent().get(i).getModName(), e);
                 break;
             } catch (ExecutionException e) {
-                SimpleModSync.LOGGER.error("[SMS-WORKER] Error during parallel download for {}",
+                Log.Log.error("bw.run.executionException", "Error during parallel download for {}",
                         this.syncData.getContent().get(i).getModName(), e);
             }
         }
@@ -171,7 +171,7 @@ public class ModDownloadWorker implements Runnable {
             this.setState(SyncState.READY);
         }
 
-        SimpleModSync.LOGGER.info("[SMS-WORKER] Synchronization finished");
+        Log.Log.info("bw.run", "Synchronization finished");
     }
 
     /**
@@ -191,43 +191,46 @@ public class ModDownloadWorker implements Runnable {
             PathUtils.CreateFolder(folder);
         }
 
+        var modName = StringUtils.removeUnwantedCharacters(content.getModName());
+        var modVersion = StringUtils.removeUnwantedCharacters(content.getVersion());
+
         String path = folder + "/" +
-                StringUtils.removeUnwantedCharacters(content.getModName()) + "-" +
-                StringUtils.removeUnwantedCharacters(content.getVersion()) +
+                modName + "-" +
+                modVersion +
                 content.getFileExtension();
 
         if (FileDownloader.fileExists(path)) {
-            SimpleModSync.LOGGER.info("[SMS-WORKER] File already exists, skipping {}", content.getModName());
+            Log.Log.debug("bw.downloadMod","File already exists, skipping {}", content.getModName());
             this.updateModProgress(content.getIndex(), 100, ContentSyncOutcome.ALREADY_EXISTS, null);
             return false;
         }
 
-        Path olderVersion = PathUtils.PathExistsFromStartInDir(Config.instance.getDownloadDestination(), content.getModName());
+        Path olderVersion = PathUtils.PathExistsFromStartInDir(folder + "/", modName);
         if (olderVersion != null) {
-            SimpleModSync.LOGGER.info("[SMS-WORKER] Found older version of {}, deleting {}", content.getModName(), olderVersion.getFileName());
+            Log.Log.debug("bw.downloadMod", "Found older version of {}, deleting {}", content.getModName(), olderVersion.getFileName());
             try {
                 Files.delete(olderVersion);
             } catch (IOException e) {
-                SimpleModSync.LOGGER.error("[SMS-WORKER] Failed to delete file", e);
+                Log.Log.error("bw.downloadMod.delete.IOException","Failed to delete file", e);
             }
         }
 
-        SimpleModSync.LOGGER.info("[SMS-WORKER] Downloading {} {}", content.getModName(), content.getVersion());
+        Log.Log.debug("bw.downloadMod", "Downloading {} {}", content.getModName(), content.getVersion());
         try {
             FileDownloader.downloadFileWithProgress(content.getUrl(), path,
                     (progress) -> this.updateModProgress(content.getIndex(), progress, ContentSyncOutcome.IN_PROGRESS, null));
         } catch (IOException e) {
-            SimpleModSync.LOGGER.error("[SMS-WORKER] Failed to download file {}", content.getModName(), e);
+            Log.Log.error("bw.downloadMod.write.IOException", "Failed to download file {}", content.getModName(), e);
             this.updateModProgress(content.getIndex(), 100, ContentSyncOutcome.DOWNLOAD_INTERRUPTED , e);
             return false;
         } catch (URISyntaxException e) {
-            SimpleModSync.LOGGER.error("[SMS-WORKER] Failed to download file {}", content.getModName(), e);
+            Log.Log.error("bw.downloadMod.write.URISyntaxException", "Failed to download file {}", content.getModName(), e);
             this.updateModProgress(content.getIndex(), 100, ContentSyncOutcome.INVALID_URL , e);
             return false;
         }
 
         this.updateModProgress(content.getIndex(), 100, ContentSyncOutcome.SUCCESS, null);
-        SimpleModSync.LOGGER.info("[SMS-WORKER] Successfully Downloaded {} {} {}", content.getModName(), content.getType(), content.getVersion());
+        Log.Log.debug("bw.downloadMod", "Successfully Downloaded {} {} {}", content.getModName(), content.getType(), content.getVersion());
         return true;
     }
 
@@ -265,9 +268,9 @@ public class ModDownloadWorker implements Runnable {
         this.errorType = errorType;
         this.setState(SyncState.ERROR);
         if (e != null) {
-            SimpleModSync.LOGGER.error("[SMS-WORKER] {}", message, e);
+            Log.Log.error("bw", "{}", message, e);
         } else {
-            SimpleModSync.LOGGER.error("[SMS-WORKER] {}", message);
+            Log.Log.error("bw", "{}", message);
         }
     }
 

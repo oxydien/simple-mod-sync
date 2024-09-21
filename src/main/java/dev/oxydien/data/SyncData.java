@@ -61,7 +61,7 @@ public class SyncData {
         public String getTypeFolder() {
             return switch (this.getType()) {
                 case "resourcepack" -> "resourcepacks";
-                case "shaderpack" -> "shaderpacks";
+                case "shader" -> "shaderpacks";
                 case "datapack" -> "datapacks";
                 case null, default -> "mods";
             };
