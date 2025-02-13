@@ -47,6 +47,11 @@ accept_mfs = False
 
 
 
+# Location of the JSON file containing additions.
+# Leave empty for no additions.
+# Example of additions.json can be found at https://github.com/oxydien/simple-mod-sync/translators
+modify_array = "./additions.json"
+
 ### CODE
 # DO NOT EDIT BELOW THIS LINE IF YOU DON'T KNOW WHAT YOU ARE DOING!
 
