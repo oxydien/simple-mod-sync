@@ -28,29 +28,37 @@ Usage:
 # Edit this part if needed.
 
 # Base path of the content where it will be hosted
-url_base_path = "https://example.com/static/content/"
+url_base_path = "https://update.tslp.eu.org/"
 
 # List of directories to parse
-working_directories = ["./", "./another/directory/"]
+working_directories = ["./client_mods/", "./mods/"]
 
 # Replace the base path of the content (override for working directories)
 working_directory_to_url_override = {
-    "./":"",                         # (empty for no override)
-    "./another/directory/":"/backup" # (ex.: ({url_base_path}/another/directory/) -> ({url_base_path}/backup/))
+    "./client_mods/":"./client_mods/",                         # (empty for override to root)
+    "./mods/":"./mods/" # (ex.: ({url_base_path}/another/directory/) -> ({url_base_path}/backup/))
 }
 
 # Location and name of the output file
 output_file = "./sync.json"
 
+
+# Fuctions below are still in development, are unstable, dangerous or all of the above.
+# If you wish to eanable tham anyway, switch this variable to "True"
+global allow_experemental
+allow_experemental = True
+
+# SympleModSync does not support Forge/NeoForge platform, and so Forge mods are ususaly omited from the syncfile.
+# However, useing some userside hacks, you stil can run SympleModSync with Forge/NeoForge.
+# Toggling this switch will make this script attempt parsing forge mods.
+accept_forge = True
+
 # If the program should try to parse files containing only MANIFEST.MF
-accept_mfs = False
+accept_mfs = True
 
-
-
-# Location of the JSON file containing additions.
-# Leave empty for no additions.
-# Example of additions.json can be found at https://github.com/oxydien/simple-mod-sync/translators
-modify_array = "./additions.json"
+# Additional files for the configuration to be pulled from file. Empty array for none.
+# TODO: Fix modifications been dubbuled
+additional_jsons = ["./custom_conf/array.json"]
 
 ### CODE
 # DO NOT EDIT BELOW THIS LINE IF YOU DON'T KNOW WHAT YOU ARE DOING!
@@ -98,6 +106,37 @@ class Content:
             "version": self.version,
             "type": self.type.name
         }
+ModificationType = enum.Enum('ModificationType', ['remove']) #TODO (LP): rename
+
+class Modification:
+    """
+    Represents a piece of content to be modifyed.
+
+    Attributes:
+        type (ModificationType): Type of modification to be made
+        pattern (str): thingth, that match this pattern will be modifyed
+    #TODO: remname
+        path (str): relative path to the things to be modifyed
+    """
+    type: ModificationType
+    pattern: str
+    path: str
+
+
+    def __init__(self, type: ModificationType, pattern: str, path: str):
+        self.pattern = pattern
+        self.path = path
+        self.type = type
+
+    def __str__(self):
+        return f"Modification(pattern={self.pattern}, path={self.path}, type={self.type})"
+
+    def __dict__(self):
+        return {
+            "pattern": self.pattern,
+            "path": self.path,
+            "type": self.type
+        }
 
 
 class SyncData:
@@ -110,26 +149,38 @@ class SyncData:
     """
     version: int
     contents: List[Content]
+    modifications: List[Modification]
 
-    def __init__(self, contents: List[Content], version: int = 3):
+    def __init__(self, contents: List[Content], modifications: List[Modification], version: int = 3):
         self.version = version
         self.contents = contents
+        self.modifications = modifications
         self.archive = None
 
     def __str__(self):
-        return f"SyncData(version={self.version}, contents={self.contents})"
+        return f"SyncData(version={self.version}, contents={self.contents}, modifications={self.modifications})"
 
     def add_content(self, content: Content):
         self.contents.append(content)
 
+    def add_modifications(self, modification: Modification):
+        self.modifications.append(modification)
+
+
     def to_json(self):
-        return json.dumps({
-            "sync_version": self.version,
-            "sync": [content.__dict__() for content in self.contents]
-        })
+        if(len(self.modifications) > 0):
+            return json.dumps({
+                "sync_version": self.version,
+                "sync": [content.__dict__() for content in self.contents],
+                "modify": [modification.__dict__() for modification in self.modifications]
+            })
+        else:
+            return json.dumps({
+                "sync_version": self.version,
+                "sync": [content.__dict__() for content in self.contents]
+            })
 
-
-class Parser:
+class Jar_Parser:
     """
     Parses .jar and .zip files into a Content object based on found manifest.
 
@@ -141,8 +192,9 @@ class Parser:
     file: str
     correction: str
     accept_mf: bool
+    accept_forge: bool
 
-    def __init__(self, file_path: str, correction: str, accept_mf: bool = False):
+    def __init__(self, file_path: str, correction: str, accept_mf: bool = False, accept_forge: bool = False):
         # Check if the file exists
         if not os.path.exists(file_path):
             raise Exception(f"{file_path} does not exist")
@@ -154,6 +206,7 @@ class Parser:
         self.file = file_path
         self.correction = correction
         self.accept_mf = accept_mf
+        self.accept_forge = accept_forge
 
     def parse(self) -> Content:
         """
@@ -202,23 +255,32 @@ class Parser:
             except:
                 pass
 
-        # Check if the program should try to parse files containing only MANIFEST.MF
-        if not self.accept_mf:
-            raise Exception("No manifest found for the file " + archive.filename + ".")
-
-        # If no manifest was found, try to find a MANIFEST.MF
-        manifests = [
+        #TODO (HP): Comments
+        paths_to_try = [
+            "fabric.mod.json",
+            "quilt.mod.json",
+            "shaders/",
+            "data/", # DEV: Might not trigger sometimes
+            "pack.mcmeta"
+        ]
+        if not (self.accept_forge and allow_experemental):
+            paths_to_try.append([
+            "META-INF/mods.toml", # NOTICE: Forge is not supported by simple-mod-sync
+            "META-INF/neoforge.mods.toml" # NOTICE: NeoForge is not supported by simple-mod-sync
+        ])
+        if not (self.accept_mf and allow_experemental):
+            paths_to_try.append([
             "MANIFEST.MF",
             "META-INF/MANIFEST.MF"
-        ]
-        for mf in manifests:
+            ])
+        for path in paths_to_try:
             try:
-                archive.getinfo(mf)
-                return mf
+                archive.getinfo(path)
+                return path
             except:
                 pass
 
-        raise Exception("Absolutely no manifest found for the file " + archive.filename + ".")
+        raise Exception("No manifest found for the file " + archive.filename + ".")
 
     def __parse_manifest(self, archive: zipfile.ZipFile) -> Content:
         """
@@ -271,7 +333,7 @@ class Parser:
             return content
 
         # NeoForge, Forge
-        elif path.endswith(".toml"):
+        elif path.endswith(".toml") :
             manifest = toml.load(data_stream)['mods'][0]
             name = manifest["displayName"] if "displayName" in manifest else manifest["modId"]
             version = manifest["version"]
@@ -340,6 +402,61 @@ class Parser:
         """
         return str(int.from_bytes(os.urandom(4), "big"))
 
+class Json_Parser:
+    """
+    Parses given json file. Returns content as dict:
+    {modifications:[Modification, ...], content:[Content, ...]}
+    """
+
+    #TODO (HP): add proper comments
+
+    def __init__(self, file_path: str):
+        # Check if the file exists
+        if not os.path.exists(file_path):
+            raise Exception(f"{file_path} does not exist")
+
+        # Check if the file is a .jar or .zip
+        if not (file_path.endswith(".json") or file_path.endswith(".JSON")):
+            raise Exception(f"{file_path} is not a .json file.")
+
+        self.file = file_path
+
+    def parse(self) -> dict:
+        print(self.file)
+        #TODO (LP): split the thing into functions
+        #TODO (HP): COMMENTS!
+        with open(self.file, "rt") as j:
+            jlist = json.loads(j.read())
+            sync_present = True
+            modify_present = True
+            try:
+                sync_list = jlist.get("sync")
+                if (len(sync_list) == 0):
+                    sync_present = False
+            except Exception:
+                sync_present = False
+            try:
+                modifications_list = jlist.get("modify")
+                if (len(modifications_list) == 0):
+                    modify_present = False
+            except Exception:
+                modify_present = False
+            if not modify_present and not sync_present:
+                raise Exception
+            sync_objects = []
+            sync_modifications = []
+            #TODO (MP): Error handeling
+            if sync_present:
+                for each in sync_list:
+                    sync_objects.append(Content(each.get("url"), each.get("name"), each.get("version"), each.get("content_type")))
+            if modify_present:
+                for each in modifications_list:
+                    print(each)
+                    sync_modifications.append(Modification(each.get("type"), each.get("pattern"), each.get("path")))
+            result = {"modifications":sync_modifications, "content":sync_objects}
+            print(result)
+        return result
+
 
 def main():
     """
@@ -348,14 +465,16 @@ def main():
     their content metadata to create a sync data file.
 
     This function iterates over files in the specified working directory,
-    identifies supported file types (.jar and .zip), and uses the Parser
+    identifies supported file types (.jar and .zip), and uses the Jar_Parser
     class to extract relevant information. The extracted content is added
-    to a SyncData object, which is then serialized to a JSON file.
+    to a SyncData object.
+    Json_Parser is run than, in order to add user`s configuration to SyncData object.
+    SyncData object dumps intself into serialized to a JSON file.
     The file is named and placed according to variable "output_file".
 
     Exceptions during parsing are caught and printed to the console.
     """
-    sync_data = SyncData(contents=[])
+    sync_data = SyncData(contents=[], modifications=[])
 
     for working_directory in working_directories:
         correction = working_directory_to_url_override[working_directory]
@@ -366,7 +485,7 @@ def main():
                 if file.endswith(".jar") or file.endswith(".zip"):
                     fixed_path = (working_directory + "/" if not working_directory.endswith("/") else working_directory)
                     file_path = fixed_path + file
-                    parser = Parser(file_path, correction, accept_mfs)
+                    parser = Jar_Parser(file_path, correction, accept_mfs, accept_forge)
                     try:
                         content = parser.parse()
                         sync_data.add_content(content)
@@ -376,9 +495,27 @@ def main():
         except Exception as e:
             print("Error parsing files in ", working_directory, " ignoring: ", e)
 
+        if allow_experemental:
+            try:
+                for j in additional_jsons:
+                    json_parser = Json_Parser(j)
+                    result = json_parser.parse()
+                    workspace = result.get("modifications")
+                    if(len(workspace) > 0):
+                        for modification in workspace:
+                            sync_data.add_modifications(modification)
+                    workspace = result.get("content")
+                    print(workspace)
+                    if(len(workspace) > 0):
+                        for content in workspace:
+                            sync_data.add_content(content)
+
+            except Exception:
+                print("Error parsing file  ", j, " ignoring.")
+
+
     with open(output_file, "w") as f:
         f.write(sync_data.to_json())
-
     print("Done")
 
 
