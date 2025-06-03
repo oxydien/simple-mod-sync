@@ -51,7 +51,10 @@ public class SyncFullViewScreen extends Screen implements ProgressCallback {
         super.init();
         this.progress = new HashMap<>();
         this.pageSize = (this.height - 100) / this.widgetHeight;
-
+        
+        // Background
+        this.addDrawableChild(new SimpleBackgroundWidget(0, 0, this.width, this.height, 0xFF000000));
+        
         // Back button
         this.addDrawableChild(new ButtonWidget.Builder(Text.translatable("simple_mod_sync.ui.sync_full_view.back_button"),
                 (buttonWidget) -> MinecraftClient.getInstance().setScreen(this.parent)).position(3, 5).size(60, 20).build());

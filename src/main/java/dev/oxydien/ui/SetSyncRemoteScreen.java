@@ -22,6 +22,7 @@ public class SetSyncRemoteScreen extends Screen {
     @Override
     public void init() {
         super.init();
+        
         // Background widget
         this.addDrawableChild(new SimpleBackgroundWidget(0, 0, this.width, this.height, 0xF1000000));
 
