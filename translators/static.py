@@ -28,21 +28,42 @@ Usage:
 # Edit this part if needed.
 
 # Base path of the content where it will be hosted
-url_base_path = "https://example.com/static/content/"
+url_base_path = "https://exaple.com/"
 
 # List of directories to parse
-working_directories = ["./", "./another/directory/"]
+working_directories = ["./client_mods/", "./mods/"]
+
+# This file contents will be added to the end of output file.
+# Write any MODIFY into .json referenced here.
+# Example:
+# === #
+# {
+#  "modify": [
+#     {
+#      "type": "remove",
+#      "pattern": "^ToughAsNail.*$",
+#      "path": "./mods"
+#     }
+#   ]
+# }
+# === #
+#
+# Leave empty for no additions
+modification_file = "./modifications.json"
+
 
 # Replace the base path of the content (override for working directories)
 working_directory_to_url_override = {
-    "./":"",                         # (empty for no override)
-    "./another/directory/":"/backup" # (ex.: ({url_base_path}/another/directory/) -> ({url_base_path}/backup/))
+    "./client_mods/":"/mods/", # (ex.: ({url_base_path}/another/directory/) -> ({url_base_path}/backup/))
 }
 
 # Location and name of the output file
-output_file = "./sync.json"
+output_file = "./mod_list.json"
 
 # If the program should try to parse files containing only MANIFEST.MF
+# .MF-manifests DO NOT declare platform
+# Usualy only coremodes use .MF-only manifests
+# Wired things might happen if .MF-only manifests are present
 accept_mfs = False
 
 
@@ -117,11 +138,11 @@ class SyncData:
     def add_content(self, content: Content):
         self.contents.append(content)
 
-    def to_json(self):
-        return json.dumps({
+    def to_dictionary(self):
+        return {
             "sync_version": self.version,
             "sync": [content.__dict__() for content in self.contents]
-        })
+        }
 
 
 class Parser:
@@ -315,7 +336,7 @@ class Parser:
                 correction = correction + "/"
 
         # Combine the base URL, the correction and the relative path
-        return url_base_path + correction + relative_path
+        return url_base_path + "/" + correction + relative_path
 
     @staticmethod
     def __get_name_from_path(path: str) -> str:
@@ -371,8 +392,22 @@ def main():
         except Exception as e:
             print("Error parsing files in ", working_directory, " ignoring: ", e)
 
+    # HACK, but simple and robus one
+    # Dump sync_data into dictionary
+    sync_data_dictionary = sync_data.to_dictionary()
+    if(len(modification_file) > 3):
+        try:
+            # Read data from file and convert it into another dictionary
+            with open(modification_file, "r") as modification_stream:
+                modifications = json.load(modification_stream)
+                # Insrt new dict into old one
+                sync_data_dictionary.update(modifications)
+        except Exception as e:
+            print("We were UNABLE to parse modifications file! Error: ", e)
+
+
     with open(output_file, "w") as f:
-        f.write(sync_data.to_json())
+        f.write(str(sync_data_dictionary))
 
     print("Done")
 
