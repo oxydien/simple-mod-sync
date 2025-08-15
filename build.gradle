@@ -40,7 +40,9 @@ processResources {
 		expand "version": project.version
 	}
 }
-
+compileJava {
+    options.compilerArgs += ['--enable-preview']
+}
 tasks.withType(JavaCompile).configureEach {
 	it.options.release = 17
 }
