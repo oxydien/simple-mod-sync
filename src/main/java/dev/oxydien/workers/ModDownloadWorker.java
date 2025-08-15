@@ -413,8 +413,8 @@ public class ModDownloadWorker implements Runnable {
         for (var filePath : relativeMatches) {
             var matcher = pattern.matcher(filePath);
             if (matcher.matches()) {
-                matches.add(filePath);
-                Log.Log.debug("bw.runModification", "Found match for {} at {}", modification.getPattern(), filePath);
+                matches.add(workingDirectory + "/" + filePath);
+                Log.Log.debug("bw.runModification", "Found match for {} at {}", modification.getPattern(), (workingDirectory + "/" + filePath));
                 break;
             }
         }
