@@ -73,11 +73,11 @@ public class ProgressHelper {
     }
 
     public void drawStatusIcon(SyncStatus syncStatus, GuiGraphics guiGraphics, int x, int y, int margin) {
-        guiGraphics.blit(RenderType::guiTextured, this.getStateIcon(syncStatus), x + margin, y + margin, 0, 0, 10, 10, 10, 10);
+        guiGraphics.blit(this.getStateIcon(syncStatus), x + margin, y + margin, 0, 0, 10, 10, 10, 10);
     }
 
     public void drawContentTypeIcon(ContentType type, GuiGraphics guiGraphics, int x, int y, int margin) {
-        guiGraphics.blit(RenderType::guiTextured, this.getContentTypeIcon(type), x + margin, y + margin, 0, 0, 10, 10, 10, 10);
+        guiGraphics.blit(this.getContentTypeIcon(type), x + margin, y + margin, 0, 0, 10, 10, 10, 10);
     }
 
     public void drawLoadingIcon(GuiGraphics guiGraphics, int x, int y) {
@@ -88,7 +88,7 @@ public class ProgressHelper {
             frameOffset = 0;
         }
 
-        guiGraphics.blit(RenderType::guiTextured, LOADING_ICON, x, y, 0, 16 * frameOffset, 16, 16, 16, 128);
+        guiGraphics.blit(LOADING_ICON, x, y, 0, 16 * frameOffset, 16, 16, 16, 128);
     }
 
     private ResourceLocation getStateIcon(SyncStatus syncStatus) {

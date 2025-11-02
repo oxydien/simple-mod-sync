@@ -50,7 +50,7 @@ public final class TotalSyncStatus extends AbstractWidget {
 
         if (this.isFocused() || mouseX < this.x + SIZE && mouseX > this.x && mouseY < this.y + SIZE && mouseY > this.y)
         {
-            guiGraphics.blitSprite(RenderType::guiTexturedOverlay, BACKGROUND, this.x, this.y, SIZE, SIZE);
+            guiGraphics.blitSprite(BACKGROUND, this.x, this.y, SIZE, SIZE);
         }
 
         if (syncWorker == null) {
