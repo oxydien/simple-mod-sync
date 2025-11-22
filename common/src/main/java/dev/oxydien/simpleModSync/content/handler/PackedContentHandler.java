@@ -91,7 +91,7 @@ public class PackedContentHandler extends ContentHandler<PackedContent> {
 
             Files.deleteIfExists(tempZipPath);
         } catch (IOException e) {
-            Log.error("UpdateVersion.PackedContentHandler.download", "Failed to download or write file {}", contentObject.getName(), e);
+            Log.error("UpdateVersion.PackedContentHandler.download", "Failed to download or extract file ", contentObject.getName(), e);
         }
     }
 }
