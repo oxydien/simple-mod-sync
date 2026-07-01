@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class FileOperations {
     private final SyncSchema syncSchema;
@@ -38,16 +37,49 @@ public class FileOperations {
     }
 
     public void downloadFileWithProgress(String uriString, Path outputPath, ProgressCallback callback) throws IOException, URISyntaxException {
-        URL url = new URI(uriString).toURL();
-        URLConnection connection = url.openConnection();
+        // Manually follow redirects so cross-protocol redirects (e.g. http -> https
+        // from URL shorteners) are handled correctly.
+        int maxRedirects = 10;
+        String currentUri = uriString;
+        URLConnection connection = null;
+        boolean resolved = false;
 
-        if  (connection instanceof HttpURLConnection httpURLConnection) {
-            httpURLConnection.setRequestMethod("GET");
+        for (int i = 0; i < maxRedirects; i++) {
+            URL url = new URI(currentUri).toURL();
+            connection = url.openConnection();
+            connection.setConnectTimeout(10_000);
+            connection.setReadTimeout(30_000);
+
+            if (connection instanceof HttpURLConnection httpURLConnection) {
+                httpURLConnection.setRequestMethod("GET");
+                httpURLConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; SimpleModSync)");
+                httpURLConnection.setInstanceFollowRedirects(false);
+
+                int responseCode = httpURLConnection.getResponseCode();
+                if (responseCode >= 300 && responseCode < 400) {
+                    String location = httpURLConnection.getHeaderField("Location");
+                    httpURLConnection.disconnect();
+                    if (location == null) {
+                        throw new IOException("Redirect (HTTP " + responseCode + ") with no Location header");
+                    }
+                    if (!location.startsWith("http://") && !location.startsWith("https://")) {
+                        URL base = new URI(currentUri).toURL();
+                        location = new URL(base, location).toString();
+                    }
+                    currentUri = location;
+                    continue;
+                }
+            }
+            resolved = true;
+            break; // non-HTTP connection or non-redirect response — proceed to download
+        }
+
+        if (!resolved) {
+            throw new IOException("Too many redirects while fetching: " + uriString);
         }
 
         long fileSize = connection.getContentLengthLong();
         InputStream inputStream = connection.getInputStream();
-
         OutputStream outputStream = Files.newOutputStream(outputPath);
 
         byte[] buffer = new byte[4096];
