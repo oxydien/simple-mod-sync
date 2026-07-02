@@ -19,7 +19,7 @@ public class DirUtils {
      * @return The path if found or null if not found
      */
     @Nullable
-    public static Path DirContains(Path path, String filename, boolean fullname) {
+    public static Path dirContains(Path path, String filename, boolean fullname) {
         try (var stream = Files.list(path)) {
             for (var dirFile : stream.toList()) {
                 if (fullname) {
@@ -47,7 +47,7 @@ public class DirUtils {
      * @param startPath The root directory path to start searching from
      * @return List of absolute file paths as strings
      */
-    public static List<Path> GetFilePaths(Path startPath) {
+    public static List<Path> getFilePaths(Path startPath) {
         List<Path> filePaths = new ArrayList<>();
 
         if (!startPath.toFile().exists() || !startPath.toFile().isDirectory()) {

@@ -17,6 +17,7 @@ DOCUMENTATION
 COMMON
  - [x] Modifications
  - [x] Auto sync
+ - [x] Follow redirect URLs (#17)
  - [ ] Minecraft version and loader check
  - [ ] Auto SMS update
  - UI

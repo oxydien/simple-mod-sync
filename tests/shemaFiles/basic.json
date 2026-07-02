@@ -1,0 +1,42 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxydien/simple-mod-sync/refs/heads/main/schema.json",
+  "sync_version": 3,
+  "sync": [
+    {
+      "$comment": "Curseforge TEST",
+      "url": "https://www.curseforge.com/api/v1/mods/419699/files/8191993/download",
+      "type": "mod",
+      "name": "architectury",
+      "version": "one"
+    },
+    {
+      "$comment": "Modrinth TEST",
+      "url": "https://cdn.modrinth.com/data/R6NEzAwj/versions/VMHXIk50/ComplementaryUnbound_r5.8.1.zip?mr_download_reason=standalone",
+      "type": "shader",
+      "name": "complementary",
+      "version": "second"
+    },
+    {
+      "$comment": "Github releases TEST",
+      "url": "https://github.com/nebuIr/Default-Dark-Mode/releases/download/2026.6.0/Default-Dark-Mode-26.2-2026.6.0.zip",
+      "type": "resourcepack",
+      "name": "dark-mode",
+      "version": "third"
+    },
+    {
+      "$comment": "Packed TEST",
+      "url": "https://cdn.modrinth.com/data/8oi3bsk5/versions/f1lDwn23/Terralith_26.1_v2.6.2.zip?mr_download_reason=standalone&mr_game_version=26.1.2&mr_loader=datapack",
+      "type": "packed",
+      "name": "terralith-packed",
+      "version": "fourth",
+      "directory": "testing/here/"
+    }
+  ],
+  "modify": [
+    {
+      "type": "remove",
+      "pattern": "^usercache\\.json$",
+      "path": "."
+    }
+  ]
+}

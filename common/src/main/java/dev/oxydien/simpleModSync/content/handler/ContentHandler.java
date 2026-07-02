@@ -45,7 +45,7 @@ public abstract class ContentHandler<T extends Content> {
         Path dir = this.GetDirectory(SimpleModSync.getInstance().getInstanceDir());
         String projectName = this.GetProjectName(contentObject);
 
-        return DirUtils.DirContains(dir, projectName, false);
+        return DirUtils.dirContains(dir, projectName, false);
     }
 
     public String GetFileName(T contentObject) {
@@ -70,7 +70,7 @@ public abstract class ContentHandler<T extends Content> {
 
         Path outputPath =  dir.resolve(fileName);
 
-        files.DownloadFromUri(contentObject.getUri(), outputPath, index);
+        files.downloadFromUri(contentObject.getUri(), outputPath, index);
     }
 
     /// 0 -> 1

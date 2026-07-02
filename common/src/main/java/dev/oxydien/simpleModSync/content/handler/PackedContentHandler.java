@@ -82,7 +82,7 @@ public class PackedContentHandler extends ContentHandler<PackedContent> {
         // Download new version
         try {
             Log.debug("UpdateVersion.PackedContentHandler", "Downloading {} {}", contentObject.getName(), contentObject.getVersion());
-            files.DownloadFromUri(contentObject.getUri(), tempZipPath, index);
+            files.downloadFromUri(contentObject.getUri(), tempZipPath, index);
 
             List<Path> modifiedFiles = ZipUtils.ExtractZipFile(tempZipPath, dir.resolve(StringUtils.sanitizeDirectory(contentObject.getDirectory())));
             List<String> modifiedFilesAsString = modifiedFiles.stream().map(Path::toString).toList();

@@ -1,0 +1,87 @@
+{
+  "$comment": "TO USE THIS: https://raw.githubusercontent.com/oxydien/simple-mod-sync/refs/heads/main/schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "sync_version": {
+      "type": "integer",
+      "examples": [
+        3
+      ]
+    },
+    "sync": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "examples": []
+          },
+          "name": {
+            "type": "string",
+            "examples": []
+          },
+          "version": {
+            "type": "string",
+            "examples": []
+          },
+          "type": {
+            "type": "string",
+            "examples": [
+              "mod",
+              "resourcepack",
+              "shader",
+              "datapack",
+              "config",
+              "packed"
+            ]
+          },
+          "directory": {
+            "$comment": "Only relevant for 'packed' type, otherwise ignored",
+            "type": "string",
+            "examples": []
+          }
+        },
+        "required": ["type", "url"]
+      }
+    },
+    "modify": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "examples": [
+              "remove",
+              "rename"
+            ]
+          },
+          "pattern": {
+            "type": "string",
+            "examples": [
+              "^usercache\\.json$",
+              "^logs/.*\\.log$"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "examples": [
+              "."
+            ]
+          },
+          "result": {
+            "$comment": "Only relevant for 'rename' type, otherwise ignored",
+            "type": "string"
+          }
+        },
+        "required": ["type", "pattern", "path"]
+      }
+    }
+  },
+  "required": [
+    "sync_version",
+    "sync"
+  ]
+}

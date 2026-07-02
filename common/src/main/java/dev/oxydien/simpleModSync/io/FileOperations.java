@@ -2,6 +2,7 @@ package dev.oxydien.simpleModSync.io;
 
 import dev.oxydien.simpleModSync.content.SyncSchema;
 import dev.oxydien.simpleModSync.content.SyncStatus;
+import dev.oxydien.simpleModSync.utils.NetUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,62 +22,23 @@ public class FileOperations {
         void onProgress(int percentage); // 0 -> 100
     }
 
-    public void DownloadFromUri(String uri, Path output, int index) {
+    public void downloadFromUri(String uri, Path output, int index) {
         try {
-            this.downloadFileWithProgress(uri, output, (newProgress) -> {
-                syncSchema.withStatus(index, (status -> {
+            this.downloadFileWithProgress(uri, output, newProgress -> {
+                syncSchema.withStatus(index, status -> {
                     status.setState(SyncStatus.SyncState.DOWNLOADING);
                     status.setDownloadProgress(newProgress / (float) 100);
-                }));
+                });
             });
         } catch (Exception e) {
-            syncSchema.withStatus(index, (status -> {
+            syncSchema.withStatus(index, status -> {
                 status.setErrorMessage(e.getMessage());
-            }));
+            });
         }
     }
 
     public void downloadFileWithProgress(String uriString, Path outputPath, ProgressCallback callback) throws IOException, URISyntaxException {
-        // Manually follow redirects so cross-protocol redirects (e.g. http -> https
-        // from URL shorteners) are handled correctly.
-        int maxRedirects = 10;
-        String currentUri = uriString;
-        URLConnection connection = null;
-        boolean resolved = false;
-
-        for (int i = 0; i < maxRedirects; i++) {
-            URL url = new URI(currentUri).toURL();
-            connection = url.openConnection();
-            connection.setConnectTimeout(10_000);
-            connection.setReadTimeout(30_000);
-
-            if (connection instanceof HttpURLConnection httpURLConnection) {
-                httpURLConnection.setRequestMethod("GET");
-                httpURLConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; SimpleModSync)");
-                httpURLConnection.setInstanceFollowRedirects(false);
-
-                int responseCode = httpURLConnection.getResponseCode();
-                if (responseCode >= 300 && responseCode < 400) {
-                    String location = httpURLConnection.getHeaderField("Location");
-                    httpURLConnection.disconnect();
-                    if (location == null) {
-                        throw new IOException("Redirect (HTTP " + responseCode + ") with no Location header");
-                    }
-                    if (!location.startsWith("http://") && !location.startsWith("https://")) {
-                        URL base = new URI(currentUri).toURL();
-                        location = new URL(base, location).toString();
-                    }
-                    currentUri = location;
-                    continue;
-                }
-            }
-            resolved = true;
-            break; // non-HTTP connection or non-redirect response — proceed to download
-        }
-
-        if (!resolved) {
-            throw new IOException("Too many redirects while fetching: " + uriString);
-        }
+        HttpURLConnection connection = NetUtils.setupConnectionWithRedirectsTo(uriString);
 
         long fileSize = connection.getContentLengthLong();
         InputStream inputStream = connection.getInputStream();
@@ -102,10 +64,7 @@ public class FileOperations {
 
         outputStream.close();
         inputStream.close();
-
-        if (connection instanceof HttpURLConnection httpURLConnection) {
-            httpURLConnection.disconnect();
-        }
+        connection.disconnect();
 
         if (lastReportedProgress < 100) {
             callback.onProgress(100);

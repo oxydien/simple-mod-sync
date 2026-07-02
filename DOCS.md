@@ -75,13 +75,13 @@ Let's add Sodium as an example. Between the square brackets `[ ]`, add:
 }
 ```
 
-> Note that the URL is only as example, look at [From Modrinth](#from-modrinth) to get
-> your own URL.
+> Note that the URL is only as example, look at [From Modrinth](#from-modrinth) or 
+> [From Curseforge](#from-curseforge) to get your own URL.
 
 **What each part means:**
 - `url` - Where to download the file from
-- `name` - A friendly name so you know what this is
-- `version` - Any text that helps you track which version this is
+- `name` - A friendly name so **you know** what this is
+- `version` - Any text that helps you track which version this is. **UPDATE THIS WHENEVER YOU CHANGE THE URL**
 - `type` - What kind of content this is (mod, resourcepack, shader, etc.)
 
 ### Step 3: Add More Content
@@ -115,6 +115,9 @@ To add more items, put a comma `,` after the closing `}` and add another item:
 1. Upload your `.json` file to a sharing service:
    - **Pastebin**: Go to pastebin.com, paste your file, save, and use the "raw" link
    - **GitHub Gist**: Create a gist at gist.github.com and use the "raw" link
+     - Url should look like `https://gist.githubusercontent.com/YOUR_USER/SOME_RANDOM_LETTERS/raw/FILE_NAME.json`
+     - Note that when you copy GIST raw link there is second random letters part that you have to remove [source](https://stackoverflow.com/questions/46073096/is-there-a-permalink-to-the-latest-version-of-gist-files#47175630)
+     - Also note that Github GIST has a 5-minute cache for requests, so it might take some time for your update to take effect
    - **Your own website**: Upload it anywhere and link directly to the file
 
 2. Make sure the link shows **only the text** (no website design around it)
@@ -126,6 +129,9 @@ To add more items, put a comma `,` after the closing `}` and add another item:
 ## Understanding the Sync File
 
 ### The Basics
+
+> [!TIP]
+> If you have a modern text editor or an IDE, you might want [the schema of the sync file](./schema.json).
 
 Every item in your sync list needs at minimum:
 - **url** - The download link
@@ -251,23 +257,27 @@ You can also use `"type": "config"` instead of `"type": "packed"` - they work th
 
 The URL should look like:
 ```
-https://cdn.modrinth.com/data/PROJECT/versions/VERSION/filename.jar
+https://cdn.modrinth.com/data/PROJECT/versions/VERSION/filename.jar?some_garbage_data_after_question_mark
 ```
 
-**Important:** Make sure it ends with `.jar` or `.zip` - if it doesn't, you copied the wrong link!
+**Important:** Make sure it has the `.jar` or `.zip` file extension - if it doesn't, you copied the wrong link!
 
 ### From CurseForge
 
-Due to the way how CurseForge works, its not as easy to get the raw file URL. Either do it 
-by inspecting the network when downloading the mod. 
+1. Go to the mod/content page on Curseforge
+2. Click on the **Files** tab
+3. Find the version you want
+4. Click the **Download file** button (under the 3 dots button)
+5. **Right-click** the "try again" link
+6. Select "Copy link address" or "Copy link"
+7. Paste this URL into your sync file
 
-![CurseForge inspect page](./.github/assets/CURSEFORGE_inspect_url.png)
 
-Or follow this reddit post: https://www.reddit.com/r/feedthebeast/comments/fffna3/comment/fjyceu8/
+![CurseForge downloading page](./.github/assets/CURSEFORGE_downloading_page.png)
 
 The URL should look like:
 ```
-https://mediafilez.forgecdn.net/files/XXXX/YYY/filename.jar
+https://www.curseforge.com/api/v1/mods/SOME_NUMBER/files/SOME_NUMBER/download
 ```
 
 **Note:** Some CurseForge links may redirect or change. If you have issues, consider re-uploading the file to a more stable hosting service.
@@ -275,7 +285,7 @@ https://mediafilez.forgecdn.net/files/XXXX/YYY/filename.jar
 ### From Other Sources
 
 You can use any direct download link that:
-- Points directly to a `.jar` or `.zip` file
+- Points (or redirects) directly to a `.jar` or `.zip` file
 - Doesn't require login or clicking through pages
 - Is publicly accessible
 
@@ -386,6 +396,8 @@ Here's a full sync file with different types of content:
 
 The `modify` section lets you automatically remove or rename files in the game instance. This is useful for cleaning up old files or managing configurations.
 
+Modifications run **in order** you put them into the `modify` list.
+
 **Structure:**
 ```json
 {
@@ -463,18 +475,36 @@ This renames `usercache.json` to `usercache_backup.json`.
 
 **Common Patterns:**
 
-| What you want | Pattern |
-|---------------|---------|
-| Exact filename | `^filename\\.txt$` |
-| Any file starting with "old" | `^old.*$` |
-| Any .log file | `^.*\\.log$` |
-| Files in config folder | `^config/.*$` |
+| What you want                | Pattern                           |
+|------------------------------|-----------------------------------|
+| Exact filename               | `^filename\\.txt$`                |
+| Specific mod (any version)   | `^mods\\/mod-name-here-.*\\.jar$` |
+| Any file starting with "old" | `^old.*$`                         |
+| Any .log file                | `^.*\\.log$`                      |
+| Files in config folder       | `^config/.*$`                     |
 
 **Important Notes:**
 - Always use double backslashes `\\` before dots in filenames (e.g., `\\.json` not `.json`)
 - Test your patterns carefully - they can match more files than you expect!
 - The `result` in rename operations is the new filename or path
 - You can test regex patterns at regex101.com before using them
+
+**Tip:**
+
+Use sites such as [regex101.com](https://regex101.com) to make your life easier.
+
+You can use the text bellow as test or example of what are you matching for exactly:
+```dummy
+config/fml.toml
+config/neoforge-client.toml
+mods/sodium-AOFNAON.jar
+mods/simplemodsync-57441wa.jar
+resourcepacks/dark-mode-diwuabkj.zip
+saves/My world/level.dat
+options.txt
+```
+
+> Basically it's a recursive list of all files (in all subdirectories) starting at the instance folder.
 
 **Full Example with Modifications:**
 ```json

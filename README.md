@@ -8,6 +8,9 @@ Simple Mod Sync lets you create a list of mods and other content that can be aut
 
 Think of it like a shopping list, but for Minecraft content. You write down what you want (the URLs to download files), and Simple Mod Sync goes shopping for you.
 
+### Need a video? *(might be outdated)*
+
+[![Watch my video](./.github/assets/oxydien_YT_video.jpg)](https://youtu.be/8SliNfmfpOs)
 
 ## Usage
 
@@ -17,12 +20,32 @@ just need to download the mod, put it into the mods file and be gone.
 If you are the one hosting the server and/or managing the mods, look into the
 [Docs file](./DOCS.md).
 
+## Found a bug or a crash?
+
+Please let me know! The best way how to make this mod better for everyone is to share problems and issues!
+
+Report bugs and crashes [here](https://github.com/oxydien/simple-mod-sync/issues).
+
+### What to include for crash *(or bugs)*?
+
+Please specify your **game version** and **mod loader**. If possible provide the **log file**.
+
+### Have a question?
+
+Create an **issue** with your question [here](https://github.com/oxydien/simple-mod-sync/issues). Or contact me directly on any of [these](https://www.oxydien.dev/#socials).
+
+In any case try to provide as much information as possible, it's easier to work with more context.
+
 ## For Developers
 
 Want to contribute? Whether it's reporting an issue or submitting a pull request, your help is highly appreciated!
 
 - [Open an Issue](https://github.com/oxydien/simple-mod-sync/issues/new)
 - [Create a Pull Request](https://github.com/oxydien/simple-mod-sync/pulls)
+
+### Testing
+
+If you want to test whether your version works as intended, you can try any of the files saved in the [tests/schemaFiles](tests/shemaFiles) directory.
 
 ## License
 
