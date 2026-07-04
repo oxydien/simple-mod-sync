@@ -104,7 +104,7 @@ public class ContentProgressWidget extends AbstractWidget {
 
             if (this.status.getState() == SyncStatus.SyncState.ERROR) {
                 String msg = this.status.getErrorMessage();
-                guiGraphics.text(this.font, String.format("§c§l%s§r", msg), this.getX() + DEFAULT_PADDING,
+                guiGraphics.text(this.font, String.format("§c%s§r", msg), this.getX() + DEFAULT_PADDING + 12,
                         this.getY() + DEFAULT_PADDING * 2 + this.font.lineHeight, 0xFF55FFFF, false);
             }
         }

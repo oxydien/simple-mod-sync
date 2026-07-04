@@ -8,7 +8,6 @@ import dev.oxydien.simpleModSync.content.handler.ContentHandler;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
-import net.minecraft.resources.Identifier;
 
 import java.util.Iterator;
 

@@ -3,6 +3,8 @@ package dev.oxydien.simpleModSync;
 import dev.oxydien.simpleModSync.config.Config;
 import dev.oxydien.simpleModSync.content.SyncSchema;
 import dev.oxydien.simpleModSync.log.Log;
+import dev.oxydien.simpleModSync.ui.modals.GameNeedsRestartModalHandler;
+import dev.oxydien.simpleModSync.ui.modals.SyncInProgressModalHandler;
 import dev.oxydien.simpleModSync.workers.SyncWorker;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,6 +33,9 @@ public abstract class SimpleModSync {
     public SyncSchema syncSchema;
     public SyncWorker syncWorker;
 
+    private SyncInProgressModalHandler _syncInProgressModal;
+    private GameNeedsRestartModalHandler _gameNeedsRestartModal;
+
     public void onInitialize() {
         Log.init(MOD_ID);
         Log.debug("Initializing SimpleModSync");
@@ -40,7 +45,7 @@ public abstract class SimpleModSync {
 
         this.Handlers.init();
 
-        if (Config.instance.getAutoDownload()) {
+        if (Config.instance.getSyncOnStartup()) {
             this.start();
         }
     }
@@ -54,6 +59,9 @@ public abstract class SimpleModSync {
 
         this.syncSchema = new SyncSchema();
         this.syncWorker = new SyncWorker(this.syncSchema);
+
+        this._syncInProgressModal = new SyncInProgressModalHandler();
+        this._gameNeedsRestartModal = new GameNeedsRestartModalHandler();
 
         Thread thread = new Thread(this.syncWorker);
         this.workerThread.set(thread);

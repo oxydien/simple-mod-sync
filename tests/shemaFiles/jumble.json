@@ -1,43 +1,44 @@
 {
   "$schema": "https://raw.githubusercontent.com/oxydien/simple-mod-sync/refs/heads/main/schema.json",
-  "$comment": "TO USE THIS: https://raw.githubusercontent.com/oxydien/simple-mod-sync/refs/heads/main/tests/shemaFiles/basic.json",
+  "$comment": "TO USE THIS: https://raw.githubusercontent.com/oxydien/simple-mod-sync/refs/heads/main/tests/shemaFiles/jumble.json",
+  "$comment2": "Purposely made to break and handle edge cases",
   "sync_version": 3,
   "sync": [
     {
-      "$comment": "Curseforge TEST",
+      "$comment": "Will fail because of type",
       "url": "https://www.curseforge.com/api/v1/mods/419699/files/8191993/download",
-      "type": "mod",
+      "type": "some_unknown_type",
       "name": "architectury",
-      "version": "one"
+      "version": "lamm"
     },
     {
-      "$comment": "Modrinth TEST",
-      "url": "https://cdn.modrinth.com/data/R6NEzAwj/versions/VMHXIk50/ComplementaryUnbound_r5.8.1.zip?mr_download_reason=standalone",
+      "$comment": "Will fail because of invalid URL",
+      "url": "ThisUrl://isNotValid",
       "type": "shader",
       "name": "complementary",
-      "version": "second"
+      "version": "recc"
     },
     {
-      "$comment": "Github releases TEST",
-      "url": "https://github.com/nebuIr/Default-Dark-Mode/releases/download/2026.6.0/Default-Dark-Mode-26.2-2026.6.0.zip",
+      "$comment": "Should remove the resourcepack and SUCCEED",
+      "url": "",
       "type": "resourcepack",
       "name": "dark-mode",
-      "version": "third"
+      "version": "fidd"
     },
     {
-      "$comment": "Packed TEST",
+      "$comment": "Will fail because of path",
       "url": "https://cdn.modrinth.com/data/8oi3bsk5/versions/f1lDwn23/Terralith_26.1_v2.6.2.zip?mr_download_reason=standalone&mr_game_version=26.1.2&mr_loader=datapack",
       "type": "packed",
       "name": "terralith-packed",
-      "version": "fourth",
-      "directory": "testing/here/"
+      "version": "matt",
+      "directory": "../../../testing/newOther"
     }
   ],
   "modify": [
     {
       "type": "remove",
       "pattern": "^usercache\\.json$",
-      "path": "."
+      "path": "../../"
     }
   ]
 }

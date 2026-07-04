@@ -3,7 +3,9 @@
 	"package": "dev.oxydien.simpleModSync.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"TitleScreenMixin"
+		"TitleScreenMixin",
+		"SelectWorldScreenMixin",
+		"JoinMultiplayerScreenMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

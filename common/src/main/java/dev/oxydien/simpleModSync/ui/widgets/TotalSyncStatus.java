@@ -54,7 +54,7 @@ public final class TotalSyncStatus extends AbstractWidget {
         }
 
         if (syncWorker == null) {
-            this.progressHelper.drawStatusIcon(SyncStatus.OfState(SyncStatus.SyncState.UNSYNCED), guiGraphics, this.x, this.y);
+            this.progressHelper.drawStatusIcon(SyncStatus.ofState(SyncStatus.SyncState.UNSYNCED), guiGraphics, this.x, this.y);
             return;
         }
 

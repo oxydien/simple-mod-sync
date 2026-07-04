@@ -1,24 +1,21 @@
 package dev.oxydien.simpleModSync.config;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import dev.oxydien.simpleModSync.log.Log;
 
 import java.io.*;
 import java.nio.file.Path;
 
 public class Config {
-    private final Path path;
-    private boolean autoDownload;
-    private String downloadUrl;
     public static Config instance;
 
+    private final Path path;
+    private final ConfigValues values;
 
     public Config(Path configFilePath) {
         this.path = configFilePath;
-        this.autoDownload = true;
-        this.downloadUrl = "";
+
+        this.values = ConfigValues.createDefault();
 
         this.load();
         this.save();
@@ -32,26 +29,8 @@ public class Config {
         return this.path;
     }
 
-    public boolean getAutoDownload() {
-        return this.autoDownload;
-    }
-
-    public void setAutoDownload(boolean autoDownload) {
-        this.autoDownload = autoDownload;
-        this.save();
-    }
-
-    public String getDownloadUrl() {
-        return this.downloadUrl;
-    }
-
-    public void setDownloadUrl(String downloadUrl) {
-        this.downloadUrl = downloadUrl;
-        this.save();
-    }
-
+    //region I/O
     // Deserialize from json file
-
     public void load() {
         // Read from json file
         StringBuilder content = new StringBuilder();
@@ -68,14 +47,11 @@ public class Config {
         }
 
         // Parse json
+        var values = this.values;
         JsonElement jsonElement = JsonParser.parseString(content.toString());
-
-        this.autoDownload = jsonElement.getAsJsonObject().get("auto_download") == null ||
-                jsonElement.getAsJsonObject().get("auto_download").getAsBoolean();
-
-        var downloadUrl = jsonElement.getAsJsonObject().get("download_url");
-        if (downloadUrl != null && !downloadUrl.getAsString().isEmpty()) {
-            this.downloadUrl = downloadUrl.getAsString();
+        if (jsonElement != null && jsonElement.isJsonObject()) {
+            var jsonObject = jsonElement.getAsJsonObject();
+            values.readFrom(jsonObject);
         }
     }
 
@@ -83,14 +59,61 @@ public class Config {
     public void save() {
         // Create json
         JsonObject json = new JsonObject();
-        json.addProperty("auto_download", this.autoDownload);
-        json.addProperty("download_url", this.downloadUrl);
+        this.values.writeTo(json);
+
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .create();
+        var content = gson.toJson(json);
 
         // Write to json file
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(this.getPath().toFile()))) {
-            bw.write(json.toString());
+            bw.write(content);
         } catch (IOException e) {
             Log.error("config.save.IOException", "Failed to write config file", e);
         }
     }
+    //endregion
+
+    //region Data
+    public boolean getSyncOnStartup() {
+        return this.values.getSyncConfig().getSyncOnStartup();
+    }
+    public void setSyncOnStartup(boolean allowed) {
+        this.values.getSyncConfig().setSyncOnStartup(allowed);
+        this.save();
+    }
+
+    public String getSchemaFileUrl() {
+        return this.values.getSyncConfig().getSyncSchemaFileUrl();
+    }
+    public void setSchemaFileUrl(String schemaFileUrl) {
+        this.values.getSyncConfig().setSyncSchemaFileUrl(schemaFileUrl);
+        this.save();
+    }
+
+    public boolean hasVisitedInitScreen() {
+        return this.values.getSeenConfig().hasVisitedInitScreen();
+    }
+    public void setHasVisitedInitScreen(boolean seenInitScreen) {
+        this.values.getSeenConfig().setHasVisitedInitScreen(seenInitScreen);
+        this.save();
+    }
+
+    public boolean isSyncInProgressPopupsAllowed() {
+        return this.values.getSeenConfig().isSyncInProgressPopupsAllowed();
+    }
+    public void setAllowSyncInProgressPopups(boolean allowed) {
+        this.values.getSeenConfig().setAllowSyncInProgressPopups(allowed);
+        this.save();
+    }
+
+    public boolean isSyncGameNeedsRestartAllowed() {
+        return this.values.getSeenConfig().isSyncGameNeedsRestartAllowed();
+    }
+    public void setAllowGameNeedsRestartPopups(boolean allowed) {
+        this.values.getSeenConfig().setAllowGameNeedsRestartPopups(allowed);
+        this.save();
+    }
+    //endregion
 }

@@ -1,5 +1,6 @@
 package dev.oxydien.simpleModSync.content;
 
+import dev.oxydien.simpleModSync.log.Log;
 import net.minecraft.network.chat.Component;
 
 public class SyncStatus {
@@ -41,13 +42,13 @@ public class SyncStatus {
         this.errorMessage = "";
     }
 
-    public static SyncStatus OfState(SyncState state) {
+    public static SyncStatus ofState(SyncState state) {
         SyncStatus status = new SyncStatus();
         status.setState(state);
         return status;
     }
 
-    public static SyncStatus OfError(String errorMessage) {
+    public static SyncStatus ofError(String errorMessage) {
         SyncStatus status = new SyncStatus();
         status.setErrorMessage(errorMessage);
         return status;
@@ -82,5 +83,13 @@ public class SyncStatus {
 
     public boolean isError() {
         return this.getState() == SyncState.ERROR;
+    }
+    public boolean isInProgress() {
+        return this.getState() == SyncState.STARTING
+                || this.getState() == SyncState.PARSING
+                || this.getState() == SyncState.DOWNLOADING;
+    }
+    public boolean isRestartNeeded() {
+        return this.getState() == SyncState.MODIFIED;
     }
 }

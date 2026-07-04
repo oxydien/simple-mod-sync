@@ -2,6 +2,7 @@ package dev.oxydien.simpleModSync.io;
 
 import dev.oxydien.simpleModSync.content.SyncSchema;
 import dev.oxydien.simpleModSync.content.SyncStatus;
+import dev.oxydien.simpleModSync.log.Log;
 import dev.oxydien.simpleModSync.utils.NetUtils;
 
 import java.io.IOException;
@@ -31,6 +32,7 @@ public class FileOperations {
                 });
             });
         } catch (Exception e) {
+            Log.error("Index %d encountered an error while downloading file from: '%s'".formatted(index, uri), e);
             syncSchema.withStatus(index, status -> {
                 status.setErrorMessage(e.getMessage());
             });

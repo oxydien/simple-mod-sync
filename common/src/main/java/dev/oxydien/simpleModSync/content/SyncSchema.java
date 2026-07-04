@@ -39,7 +39,7 @@ public class SyncSchema {
 
         for (int i = 0; i < syncArray.size(); i++) {
             if (!syncArray.get(i).isJsonObject()) {
-                this.progress.put(i, SyncStatus.OfState(SyncStatus.SyncState.INVALID));
+                this.progress.put(i, SyncStatus.ofState(SyncStatus.SyncState.INVALID));
                 continue;
             }
 
@@ -65,8 +65,9 @@ public class SyncSchema {
         return new SyncWork(contentIndexesToCheck, modificationIndexesToCheck);
     }
 
+    @FunctionalInterface
     public interface UpdateStatusHandler {
-        void UpdateStatus(SyncStatus status);
+        void updateStatus(SyncStatus status);
     }
 
     public void withStatus(int index, UpdateStatusHandler handler) {
@@ -76,7 +77,7 @@ public class SyncSchema {
 
         // Just to be sure :3
         SyncStatus status = this.progress.get(index);
-        handler.UpdateStatus(status);
+        handler.updateStatus(status);
         this.progress.put(index, status);
     }
 

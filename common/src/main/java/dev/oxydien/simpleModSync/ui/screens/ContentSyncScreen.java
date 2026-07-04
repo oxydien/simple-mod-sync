@@ -1,16 +1,15 @@
 package dev.oxydien.simpleModSync.ui.screens;
 
 import dev.oxydien.simpleModSync.SimpleModSync;
-import dev.oxydien.simpleModSync.config.Config;
 import dev.oxydien.simpleModSync.content.SyncSchema;
 import dev.oxydien.simpleModSync.ui.ProgressHelper;
+import dev.oxydien.simpleModSync.ui.modals.SettingsModalHandler;
 import dev.oxydien.simpleModSync.ui.widgets.ContentProgressWidget;
 import dev.oxydien.simpleModSync.ui.widgets.TotalSyncProgress;
 import dev.oxydien.simpleModSync.workers.SyncWorker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.MultiLineTextWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
@@ -57,48 +56,17 @@ public class ContentSyncScreen extends Screen {
         TotalSyncProgress barWidget = new TotalSyncProgress(0, 0, this.width, heightOffset, this.progressHelper);
         this.addRenderableOnly(barWidget);
 
-        // Back button
-        this.addRenderableWidget(new Button.Builder(Component.translatable("simple_mod_sync.ui.content_screen.back_button"),
-                (buttonWidget) -> Minecraft.getInstance().setScreen(this.parent)).pos(3, 5).size(60, 20).build());
 
         // Title
         Component titleText = Component.translatable("simple_mod_sync.ui.content_screen.title").withColor(0xFF3DF6B4);
         this.addRenderableOnly(
                 new MultiLineTextWidget(this.width / 2 - titleText.getString().length() - 30, 10, titleText, this.font));
 
-        // Url field
-        EditBox urlField = new EditBox(this.font, this.width / 2 - 150, 24,
-                300, 20, Component.literal(""));
-        urlField.setMaxLength(368);
-        urlField.setValue(Config.instance.getDownloadUrl());
-        this.addRenderableWidget(urlField);
-
-        // Save Url button
-        this.addRenderableWidget(new Button.Builder(Component.translatable("simple_mod_sync.ui.content_screen.save_url_button"), (buttonWidget) -> {
-            String url = urlField.getValue();
-            Config.instance.setDownloadUrl(url);
-        }).pos(this.width / 2 - 150, 45).size(95, 20).build());
-
-        // Sync button
-        this.addRenderableWidget(new Button.Builder(Component.translatable("simple_mod_sync.ui.content_screen.sync_button"),
-                (buttonWidget) -> this.startSync()).pos(this.width / 2 - 48, 45).size(95, 20).build());
-
-        // Auto download toggle button widget
-        AtomicBoolean autoDownload = new AtomicBoolean(Config.instance.getAutoDownload());
-        Component autoDownloadTextTrue = Component.translatable("simple_mod_sync.ui.content_screen.auto_download_true");
-        Component autoDownloadTextFalse = Component.translatable("simple_mod_sync.ui.content_screen.auto_download_false");
-        Button auto_download = new Button.Builder(autoDownload.get() ? autoDownloadTextTrue : autoDownloadTextFalse, (buttonWidget) -> {
-            autoDownload.set(!autoDownload.get());
-            Config.instance.setAutoDownload(autoDownload.get());
-            buttonWidget.setMessage(autoDownload.get() ? autoDownloadTextTrue : autoDownloadTextFalse);
-        }).pos(this.width / 2 + 55, 45).size(95, 20).build();
-        this.addRenderableWidget(auto_download);
-
-        int contentLeft = this.width / 2 - 150;
 
         // Initialize scrollable content list
-        int listTop = 80;
-        int listBottom = this.height - 5;
+        int contentLeft = this.width / 2 - 150;
+        int listTop = 30;
+        int listBottom = this.height - 35;
 
         this.contentList = new ScrollableContentList(
                 CONTENT_WIDTH,
@@ -107,8 +75,25 @@ public class ContentSyncScreen extends Screen {
                 contentLeft
         );
         this.addWidget(this.contentList);
-
         this.initContent();
+
+        // Navigation buttons
+        var btnWidth = 92;
+        var btnHalfWidth = btnWidth / 2;
+        var btnHeight = 20;
+
+        var btnY = this.height - btnHeight - 5;
+        // - Sync button
+        this.addRenderableWidget(new Button.Builder(Component.translatable("simple_mod_sync.ui.content_screen.sync_button"), (_) -> this.startSync())
+                .pos(this.width / 2 - btnWidth - btnHalfWidth - 5, btnY).size(btnWidth, btnHeight).build());
+
+        // - Settings button
+        this.addRenderableWidget(new Button.Builder(Component.translatable("simple_mod_sync.ui.content_screen.settings_button"), (_) -> SettingsModalHandler.open(this))
+                .pos(this.width / 2 - btnHalfWidth, btnY).size(btnWidth, btnHeight).build());
+
+        // - Back button
+        this.addRenderableWidget(new Button.Builder(Component.translatable("simple_mod_sync.ui.content_screen.back_button"), (_) -> Minecraft.getInstance().setScreen(this.parent))
+                .pos(this.width / 2 + btnHalfWidth + 5, btnY).size(btnWidth, btnHeight).build());
     }
 
     private void initContent() {
@@ -152,7 +137,7 @@ public class ContentSyncScreen extends Screen {
         }
 
         if (this.worker != null && this.worker.getStatus().isError()) {
-            guiGraphics.text(this.font, this.worker.getStatus().getErrorMessage(), this.width / 2 - 150, 65, 0xFFFF1C1C, false);
+            guiGraphics.centeredText(this.font, this.worker.getStatus().getErrorMessage(), this.width / 2, 20, 0xFFFF1C1C);
         }
     }
 

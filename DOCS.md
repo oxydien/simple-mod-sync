@@ -169,6 +169,20 @@ When you update:
 
 Simple Mod Sync sees the version changed and downloads the new file!
 
+> [!TIP]
+> You can remove mods by making their `url` field empty and changing their `version` field.
+> 
+> **Example**
+> ```json
+> {
+>   "url": "",
+>   "version": "0.7.0",
+>   "name": "Sodium"
+> }
+> ```
+> This will remove the *Sodium* mod, because there is no url present to download a new version.
+
+
 ---
 
 ## Different Types of Content
@@ -246,14 +260,15 @@ You can also use `"type": "config"` instead of `"type": "packed"` - they work th
 
 ### From Modrinth
 
-![Modrinth versions page example](./.github/assets/MODRINTH_versions_page.png)
-
 1. Go to the mod/pack page on Modrinth
 2. Click the **Versions** tab
 3. Find the version you want
 4. **Right-click** the download button
 5. Select "Copy link address" or "Copy link"
 6. Paste this URL into your sync file
+
+
+![Modrinth versions page example](./.github/assets/MODRINTH_versions_page.png)
 
 The URL should look like:
 ```

@@ -24,7 +24,7 @@ COMMON
    - [x] Update list of contents when schema parsed
    - [x] Content type icon
    - [x] Init screen
-   - [ ] Restart game popup
+   - [x] Restart game popup
    - [w] Translations
    - [x] Tooltips
 
