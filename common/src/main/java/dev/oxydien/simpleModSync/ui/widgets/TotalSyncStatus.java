@@ -70,7 +70,7 @@ public final class TotalSyncStatus extends AbstractWidget {
     @Override
     public void onClick(@NotNull MouseButtonEvent event, boolean isDoubleClick) {
         super.onClick(event, isDoubleClick);
-        Minecraft.getInstance().setScreen(new ContentSyncScreen(Component.translatable("simple_mod_sync.ui.sync_full_view.title"), null));
+        Minecraft.getInstance().setScreenAndShow(new ContentSyncScreen(Component.translatable("simple_mod_sync.ui.sync_full_view.title"), null));
     }
 
     @Override

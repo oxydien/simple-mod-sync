@@ -32,7 +32,7 @@ public class SyncInProgressModalHandler {
         if (!Config.instance.isSyncInProgressPopupsAllowed()) return false;
 
         var mc = Minecraft.getInstance();
-        var scr = mc.screen;
+        var scr = mc.gui.screen();
         var lh = mc.font.lineHeight;
         AtomicReference<Checkbox> dontShowEver = new AtomicReference<>();
         var title = Component.translatable("simple_mod_sync.ui.modal.sync_in_progress.title")

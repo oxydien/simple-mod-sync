@@ -144,7 +144,7 @@ public class InitScreen extends Screen {
             SimpleModSync.getInstance().start();
         }
 
-        this.minecraft.setScreen(new TitleScreen());
+        this.minecraft.setScreenAndShow(new TitleScreen());
     }
 
     private int getCenteredXFor(Component component) {
@@ -155,6 +155,6 @@ public class InitScreen extends Screen {
 
     @Override
     public void onClose() {
-        this.minecraft.setScreen(new TitleScreen());
+        this.minecraft.setScreenAndShow(new TitleScreen());
     }
 }

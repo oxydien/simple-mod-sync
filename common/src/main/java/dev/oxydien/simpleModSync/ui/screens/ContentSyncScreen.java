@@ -89,7 +89,7 @@ public class ContentSyncScreen extends Screen {
                 .pos(this.width / 2 - btnHalfWidth, btnY).size(btnWidth, btnHeight).build());
 
         // - Back button
-        this.addRenderableWidget(new Button.Builder(Component.translatable("simple_mod_sync.ui.content_screen.back_button"), (_) -> Minecraft.getInstance().setScreen(this.parent))
+        this.addRenderableWidget(new Button.Builder(Component.translatable("simple_mod_sync.ui.content_screen.back_button"), (_) -> Minecraft.getInstance().setScreenAndShow(this.parent))
                 .pos(this.width / 2 + btnHalfWidth + 5, btnY).size(btnWidth, btnHeight).build());
     }
 

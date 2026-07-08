@@ -32,7 +32,7 @@ public class GameNeedsRestartModalHandler {
         if (!Config.instance.isSyncGameNeedsRestartAllowed()) return false;
 
         var mc = Minecraft.getInstance();
-        var scr = mc.screen;
+        var scr = mc.gui.screen();
         var lh = mc.font.lineHeight;
         AtomicReference<Checkbox> dontShowEver = new AtomicReference<>();
 

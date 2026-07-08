@@ -25,7 +25,7 @@ public class TitleScreenMixin extends Screen {
     @Inject(at = @At("HEAD"), method = "init", cancellable = true)
     private void simple_mod_sync$initHead(CallbackInfo ci) {
         if (!Config.instance.hasVisitedInitScreen()) {
-            Minecraft.getInstance().setScreen(new InitScreen());
+            Minecraft.getInstance().setScreenAndShow(new InitScreen());
             ci.cancel();
         }
     }

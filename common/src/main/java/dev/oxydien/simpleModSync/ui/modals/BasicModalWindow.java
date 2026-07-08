@@ -100,7 +100,7 @@ public class BasicModalWindow extends Screen {
 
     @Override
     public void onClose() {
-        this.minecraft.setScreen(this.parentScreen);
+        this.minecraft.setScreenAndShow(this.parentScreen);
     }
 
 
