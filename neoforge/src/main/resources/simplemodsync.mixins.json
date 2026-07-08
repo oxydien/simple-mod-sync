@@ -5,7 +5,9 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
   "client": [
-    "TitleScreenMixin"
+    "TitleScreenMixin",
+    "SelectWorldScreenMixin",
+    "JoinMultiplayerScreenMixin"
   ],
   "server": [],
   "injectors": {

@@ -12,9 +12,7 @@ import java.util.stream.Collectors;
 
 public class DownloadUtils {
     public static String downloadString(String uriString) throws IOException, URISyntaxException {
-        URL url = new URI(uriString).toURL();
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
+        HttpURLConnection connection = NetUtils.setupConnectionWithRedirectsTo(uriString);
 
         InputStream inputStream = connection.getInputStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));

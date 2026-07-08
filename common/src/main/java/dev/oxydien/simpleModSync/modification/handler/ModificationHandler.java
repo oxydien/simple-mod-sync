@@ -1,9 +1,6 @@
 package dev.oxydien.simpleModSync.modification.handler;
 
 import com.google.gson.JsonObject;
-import dev.oxydien.simpleModSync.content.Content;
-import dev.oxydien.simpleModSync.content.ContentType;
-import dev.oxydien.simpleModSync.content.ContentTypeUtils;
 import dev.oxydien.simpleModSync.exception.JsonValidationException;
 import dev.oxydien.simpleModSync.log.Log;
 import dev.oxydien.simpleModSync.modification.Modification;

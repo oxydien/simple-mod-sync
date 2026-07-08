@@ -50,7 +50,7 @@ public class InitScreen extends Screen {
         urlField.setMaxLength(500);
 
         // Load current URL if exists
-        String currentUrl = Config.instance.getDownloadUrl();
+        String currentUrl = Config.instance.getSchemaFileUrl();
         if (currentUrl != null && !currentUrl.isEmpty()) {
             urlField.setValue(currentUrl);
         }
@@ -63,7 +63,7 @@ public class InitScreen extends Screen {
                         Component.translatable("simple_mod_sync.ui.init_screen.auto_update"),
                         this.font)
                 .pos(centerX - CONTENT_WIDTH / 2, currentY)
-                .selected(Config.instance.getAutoDownload())
+                .selected(Config.instance.getSyncOnStartup())
                 .build();
 
         this.addRenderableWidget(autoUpdateCheckbox);
@@ -127,17 +127,16 @@ public class InitScreen extends Screen {
         String url = urlField.getValue().trim();
 
         // Validate URL
-        if (url.isEmpty()) {
-            Config.instance.setDownloadUrl("-");
-        } else {
+        if (!url.isEmpty()) {
             if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                urlField.setTextColor(0xFF5555);
+                urlField.setSuggestion(" Invalid URL. Try again.");
                 return;
             }
-            Config.instance.setDownloadUrl(url);
+            Config.instance.setSchemaFileUrl(url);
         }
 
-        Config.instance.setAutoDownload(autoUpdateCheckbox.selected());
+        Config.instance.setHasVisitedInitScreen(true);
+        Config.instance.setSyncOnStartup(autoUpdateCheckbox.selected());
 
         if (autoUpdateCheckbox.selected()) {
             SimpleModSync.getInstance().start();

@@ -2,6 +2,8 @@ package dev.oxydien.simpleModSync.io;
 
 import dev.oxydien.simpleModSync.content.SyncSchema;
 import dev.oxydien.simpleModSync.content.SyncStatus;
+import dev.oxydien.simpleModSync.log.Log;
+import dev.oxydien.simpleModSync.utils.NetUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +33,7 @@ public class FileOperations {
                 }));
             });
         } catch (Exception e) {
+            Log.error("Index %d encountered an error while downloading file from: '%s'".formatted(index, uri), e);
             syncSchema.withStatus(index, (status -> {
                 status.setErrorMessage(e.getMessage());
             }));
@@ -38,12 +41,7 @@ public class FileOperations {
     }
 
     public void downloadFileWithProgress(String uriString, Path outputPath, ProgressCallback callback) throws IOException, URISyntaxException {
-        URL url = new URI(uriString).toURL();
-        URLConnection connection = url.openConnection();
-
-        if  (connection instanceof HttpURLConnection httpURLConnection) {
-            httpURLConnection.setRequestMethod("GET");
-        }
+        HttpURLConnection connection = NetUtils.setupConnectionWithRedirectsTo(uriString);
 
         long fileSize = connection.getContentLengthLong();
         InputStream inputStream = connection.getInputStream();
@@ -70,6 +68,7 @@ public class FileOperations {
 
         outputStream.close();
         inputStream.close();
+        connection.disconnect();
 
         if (connection instanceof HttpURLConnection httpURLConnection) {
             httpURLConnection.disconnect();

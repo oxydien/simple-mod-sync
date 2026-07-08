@@ -17,6 +17,7 @@ import dev.oxydien.simpleModSync.utils.DownloadUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -35,7 +36,7 @@ public class SyncWorker implements Runnable {
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private final ExecutorService virtualThreadExecutor;
     private final AtomicReference<SyncStatus> syncStatus = new AtomicReference<>(new SyncStatus());
-    private final AtomicReference<SyncWorkerUpdateCallback> updateCallback = new AtomicReference<>();
+    private final AtomicReference<List<SyncWorkerUpdateCallback>> updateCallback = new AtomicReference<>();
 
     public SyncWorker(SyncSchema schema) {
         this.schema = schema;
@@ -58,7 +59,7 @@ public class SyncWorker implements Runnable {
 
         try {
             // Download the base json
-            String url = Config.instance.getDownloadUrl();
+            String url = Config.instance.getSchemaFileUrl();
 
             if (url.isBlank() || url.length() < 4) {
                 this.syncStatus.set(SyncStatus.OfState(SyncStatus.SyncState.UNSYNCED));
@@ -87,7 +88,7 @@ public class SyncWorker implements Runnable {
             Log.error("run.SyncWorker.IOException", "Failed to download syncSchema file", e);
             this.changeStatus(SyncStatus.OfError("Failed to download syncSchema file"));
         } catch (URISyntaxException e) {
-            Log.error("run.SyncWorker.URISyntaxException", "Invalid syncScheme URL address", e);
+            Log.error("run.SyncWorker.URISyntaxException", "Invalid sync scheme file URL address", e);
             this.changeStatus(SyncStatus.OfError("Invalid syncScheme URL address"));
         } catch (JsonSyntaxException e) {
             Log.error("run.SyncWorker.JsonSyntaxException", "Invalid json format", e);
@@ -175,6 +176,7 @@ public class SyncWorker implements Runnable {
 
         ContentHandler<?> handler = registry.getContentHandler(type);
         if (handler == null) {
+            Log.error("Index %d has unknown content handler type: '%s'".formatted(index, type));
             schema.withStatus(index, status -> {
                 status.setState(SyncStatus.SyncState.UNSUPPORTED);
             });
@@ -247,12 +249,17 @@ public class SyncWorker implements Runnable {
     private void changeStatus(SyncStatus syncStatus) {
         this.syncStatus.set(syncStatus);
         if (this.updateCallback.get() != null) {
-            this.updateCallback.get().update();
+            for (var handler : this.updateCallback.get()) {
+                handler.update();
+            }
         }
     }
 
     public void subscribeUpdateCallback(SyncWorkerUpdateCallback callback) {
-        this.updateCallback.set(callback);
+        if (this.updateCallback.get() == null) {
+            this.updateCallback.set(new ArrayList<>());
+        }
+        this.updateCallback.get().add(callback);
     }
 
     public boolean isRunning() {

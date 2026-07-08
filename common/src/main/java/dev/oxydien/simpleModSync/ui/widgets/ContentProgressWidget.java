@@ -65,6 +65,7 @@ public class ContentProgressWidget extends AbstractWidget {
         builder.append(this.getModName());
         builder.append(": ");
         if (this.status != null) {
+            builder.append("\n");
             builder.append(SyncStatus.TranslatedState(this.status.getState()));
         }
         this.setTooltip(Tooltip.create(builder));

@@ -64,13 +64,19 @@ public abstract class ContentHandler<T extends Content> {
         return !this.CheckExistence(contentObject);
     }
 
-    public void UpdateVersion(T contentObject, FileOperations files, int index) {
+    public boolean UpdateVersion(T contentObject, FileOperations files, int index) {
         Path dir = this.GetDirectory(SimpleModSync.getInstance().getInstanceDir());
         String fileName = this.GetFileName(contentObject);
 
         Path outputPath =  dir.resolve(fileName);
+        var uri = contentObject.getUri();
 
-        files.DownloadFromUri(contentObject.getUri(), outputPath, index);
+        if (uri.trim().isEmpty()) {
+            return false;
+        }
+
+        files.DownloadFromUri(uri, outputPath, index);
+        return true;
     }
 
     /// 0 -> 1

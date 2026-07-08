@@ -83,4 +83,12 @@ public class SyncStatus {
     public boolean isError() {
         return this.getState() == SyncState.ERROR;
     }
+    public boolean isInProgress() {
+        return this.getState() == SyncState.STARTING
+                || this.getState() == SyncState.PARSING
+                || this.getState() == SyncState.DOWNLOADING;
+    }
+    public boolean isRestartNeeded() {
+        return this.getState() == SyncState.MODIFIED;
+    }
 }

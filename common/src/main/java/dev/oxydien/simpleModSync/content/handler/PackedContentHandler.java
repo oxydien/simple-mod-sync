@@ -8,6 +8,7 @@ import dev.oxydien.simpleModSync.content.PackedContent;
 import dev.oxydien.simpleModSync.content.PackedContentMetadata;
 import dev.oxydien.simpleModSync.io.FileOperations;
 import dev.oxydien.simpleModSync.log.Log;
+import dev.oxydien.simpleModSync.utils.DirUtils;
 import dev.oxydien.simpleModSync.utils.StringUtils;
 import dev.oxydien.simpleModSync.utils.ZipUtils;
 
@@ -47,7 +48,7 @@ public class PackedContentHandler extends ContentHandler<PackedContent> {
     }
 
     @Override
-    public void UpdateVersion(PackedContent contentObject, FileOperations files, int index) {
+    public boolean UpdateVersion(PackedContent contentObject, FileOperations files, int index) {
         Path dir = this.GetDirectory(SimpleModSync.getInstance().getInstanceDir());
         String safeName = StringUtils.sanitize(contentObject.getName());
         String safeVersion = StringUtils.sanitize(contentObject.getVersion());
@@ -55,6 +56,11 @@ public class PackedContentHandler extends ContentHandler<PackedContent> {
         Path metadataPath = dir.resolve(this.GetFileName(contentObject));
         Path tempZipPath = dir.resolve(String.format("sms_%s-%s.archive.zip", safeName, safeVersion));
 
+        var uri = contentObject.getUri();
+
+        if (uri.trim().isEmpty()) {
+            return false;
+        }
 
         // Remove older version if exists
         Path olderVersion = this.GetOlderVersion(contentObject);
@@ -82,9 +88,11 @@ public class PackedContentHandler extends ContentHandler<PackedContent> {
         // Download new version
         try {
             Log.debug("UpdateVersion.PackedContentHandler", "Downloading {} {}", contentObject.getName(), contentObject.getVersion());
-            files.DownloadFromUri(contentObject.getUri(), tempZipPath, index);
+            files.DownloadFromUri(uri, tempZipPath, index);
 
-            List<Path> modifiedFiles = ZipUtils.ExtractZipFile(tempZipPath, dir.resolve(StringUtils.sanitizeDirectory(contentObject.getDirectory())));
+            var sanitizedDir = DirUtils.sanitizePath(dir, StringUtils.sanitizeDirectory(contentObject.getDirectory()));
+
+            List<Path> modifiedFiles = ZipUtils.ExtractZipFile(tempZipPath, sanitizedDir);
             List<String> modifiedFilesAsString = modifiedFiles.stream().map(Path::toString).toList();
             PackedContentMetadata metadata = new PackedContentMetadata(modifiedFilesAsString);
             Files.writeString(metadataPath, metadata.toJsonString());
@@ -93,5 +101,6 @@ public class PackedContentHandler extends ContentHandler<PackedContent> {
         } catch (IOException e) {
             Log.error("UpdateVersion.PackedContentHandler.download", "Failed to download or extract file ", contentObject.getName(), e);
         }
+        return true;
     }
 }

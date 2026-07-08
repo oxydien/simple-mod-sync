@@ -35,6 +35,7 @@ public class ContentWorker {
         try {
              content = handler.ParseJson(contentObject, index);
         } catch (Exception e) {
+            Log.error("Worker %d encountered an exception while parsing content".formatted(wid), e);
             this.schema.withStatus(index, (status) -> {
                 status.setErrorMessage(e.getMessage());
             });
@@ -50,6 +51,7 @@ public class ContentWorker {
             try {
                 Files.createDirectories(contentDir);
             } catch (IOException e) {
+                Log.error("Worker %d encountered an exception while checking file system".formatted(wid), e);
                 this.schema.withStatus(index, (status) -> {
                     status.setErrorMessage(e.getMessage());
                 });
@@ -75,19 +77,29 @@ public class ContentWorker {
                 Files.delete(olderVersion);
             }
         }  catch (Exception e) {
+            Log.error("Worker %d encountered an exception while removing older version".formatted(wid), e);
             this.schema.withStatus(index, (status) -> {
                 status.setErrorMessage(e.getMessage());
             });
         }
 
         // Downloading new version
-        handler.UpdateVersion(content, this.files , index);
+        var downloaded = handler.UpdateVersion(content, this.files , index);
 
         // Finished
-        if (handler.CheckExistence(content)) {
+        var exists = handler.CheckExistence(content);
+        if ((downloaded && exists) || (!downloaded && exists)) {
             this.schema.withStatus(index, (status) -> {
                 status.setState(SyncStatus.SyncState.MODIFIED);
             });
+        } else if (!downloaded) {
+            this.schema.withStatus(index, (status) -> {
+                status.setState(SyncStatus.SyncState.FINISHED);
+            });
+        }
+
+        if (!downloaded) {
+            Log.debug("Worker %d with index %d has removed old content, but has not downloaded a new version (empty url)".formatted(wid, index));
         }
 
         Log.debug("Worker %d finished index %d".formatted(wid, index));
