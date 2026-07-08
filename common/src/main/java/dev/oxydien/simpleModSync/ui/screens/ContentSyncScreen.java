@@ -25,7 +25,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ContentSyncScreen extends Screen {
     private static final int WIDGET_GAP = 4;
@@ -36,7 +35,6 @@ public class ContentSyncScreen extends Screen {
     private final Screen parent;
     private ScrollableContentList contentList;
     private final ProgressHelper progressHelper;
-    private String errorMessage;
 
     public ContentSyncScreen(Component title, @Nullable Screen parent) {
         super(title);
@@ -44,7 +42,6 @@ public class ContentSyncScreen extends Screen {
         this.worker = SimpleModSync.getInstance().syncWorker;
         this.parent = parent;
         this.progressHelper = new ProgressHelper(SimpleModSync.getInstance());
-        this.errorMessage = "";
     }
 
     @Override
@@ -98,9 +95,9 @@ public class ContentSyncScreen extends Screen {
 
     private void initContent() {
         if (this.schema == null || this.contentList == null) return;
-        this.contentList.clean(false);
 
         var progress = this.schema.getProgress();
+        List<ContentProgressWidget> newEntries = new ArrayList<>();
 
         for (var iterator = progress.keys().asIterator(); iterator.hasNext();) {
             int key = iterator.next();
@@ -108,28 +105,23 @@ public class ContentSyncScreen extends Screen {
             ContentProgressWidget widget = new ContentProgressWidget(
                     0, 0, CONTENT_WIDTH, this.font, this.progressHelper, this.schema, key
             );
-            this.contentList.addEntry(widget);
+            newEntries.add(widget);
         }
+
+        this.contentList.replaceEntries(newEntries);
     }
 
     private void updateState() {
         this.initContent();
-
-        if (this.worker != null)
-            if (this.worker.getStatus().isError()) {
-                this.errorMessage = this.worker.getStatus().getErrorMessage();
-            } else {
-                this.errorMessage = "";
-            }
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void extractRenderState(@NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
         if (this.worker == null && SimpleModSync.getInstance().syncWorker != null) {
             this.schema = SimpleModSync.getInstance().syncSchema;
             this.worker = SimpleModSync.getInstance().syncWorker;
-            this.worker.subscribeUpdateCallback(this::updateState);
+            this.worker.subscribeUpdateCallback(() -> Minecraft.getInstance().execute(this::updateState));
         }
 
         if (this.contentList != null) {
@@ -158,7 +150,7 @@ public class ContentSyncScreen extends Screen {
 
     // Inner class for scrollable list
     private static class ScrollableContentList extends AbstractContainerEventHandler implements Renderable, GuiEventListener, NarratableEntry {
-        private final List<ContentProgressWidget> entries = new ArrayList<>();
+        private volatile List<ContentProgressWidget> entries = new ArrayList<>();
         private final int width;
         private final int height;
         private final int top;
@@ -173,15 +165,9 @@ public class ContentSyncScreen extends Screen {
             this.left = left;
         }
 
-        public void addEntry(ContentProgressWidget widget) {
-            this.entries.add(widget);
+        public void replaceEntries(List<ContentProgressWidget> newEntries) {
+            this.entries = newEntries;
             this.updatePositions();
-        }
-
-        public void clean(boolean updatePositions) {
-            this.entries.clear();
-            if (updatePositions)
-                this.updatePositions();
         }
 
         private void updatePositions() {
@@ -295,17 +281,17 @@ public class ContentSyncScreen extends Screen {
         }
 
         @Override
-        public List<? extends GuiEventListener> children() {
+        public @NotNull List<? extends GuiEventListener> children() {
             return this.entries;
         }
 
         @Override
-        public NarrationPriority narrationPriority() {
+        public @NotNull NarrationPriority narrationPriority() {
             return NarrationPriority.NONE;
         }
 
         @Override
-        public void updateNarration(NarrationElementOutput narrationElementOutput) {
+        public void updateNarration(@NotNull NarrationElementOutput narrationElementOutput) {
 
         }
     }

@@ -24,7 +24,7 @@
   "simple_mod_sync.ui.sync_state.unsupported": "Unsupported feature, see more in logs",
   "simple_mod_sync.ui.sync_state.error": "Something went wrong, see more in game logs",
   "simple_mod_sync.ui.modal.close_btn": "Close",
-  "simple_mod_sync.ui.modal.restart_required.title": "Game needs restart",
+  "simple_mod_sync.ui.modal.restart_required.title": "Game requires restart",
   "simple_mod_sync.ui.modal.restart_required.body": "Simple mod sync has updated\nyour game content.\n\nPlease restart your game!",
   "simple_mod_sync.ui.modal.sync_in_progress.title": "Synchronization in progress",
   "simple_mod_sync.ui.modal.sync_in_progress.body": "Simple mod sync has not\nfinished synchronization process\n\nPlease wait a bit longer.",
