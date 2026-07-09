@@ -20,6 +20,12 @@ just need to download the mod, put it into the mods file and be gone.
 If you are the one hosting the server and/or managing the mods, look into the
 [Docs file](./DOCS.md).
 
+### Checkout the website
+
+The website provides a tool for maintaining your schema file and adding content from various content platforms such as Modrinth and Curseforge.
+
+[![Website landing banner](./.github/assets/WEBSITE_landing.png)](https://sms.oxydien.dev/)
+
 ## Found a bug or a crash?
 
 Please let me know! The best way how to make this mod better for everyone is to share problems and issues!

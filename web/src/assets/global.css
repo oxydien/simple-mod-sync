@@ -46,7 +46,7 @@ img {
 }
 
 .loading-spinner {
-    background-image: url(/src/public/assets/icons/loading.png);
+    background-image: url(/assets/icons/loading.png);
     background-size: 100% 800%;
     background-repeat: no-repeat;
     background-position: 0 0;
@@ -84,16 +84,16 @@ img {
     cursor: not-allowed;
 }
 .btn.btn-default {
-    border-image: url("/src/public/assets/button_base.png") 32 / 32px round;
+    border-image: url("/assets/button_base.png") 32 / 32px round;
 }
 .btn.btn-default:hover:not(:disabled), .btn.btn-default:focus-visible:not(:disabled) {
-    border-image: url("/src/public/assets/button_base_hover.png") 32 / 32px round;
+    border-image: url("/assets/button_base_hover.png") 32 / 32px round;
 }
 .btn.btn-primary {
-    border-image: url("/src/public/assets/button_primary.png") 32 / 32px round;
+    border-image: url("/assets/button_primary.png") 32 / 32px round;
 }
 .btn.btn-primary:hover:not(:disabled), .btn.btn-primary:focus-visible:not(:disabled) {
-    border-image: url("/src/public/assets/button_primary_hover.png") 32 / 32px round;
+    border-image: url("/assets/button_primary_hover.png") 32 / 32px round;
 }
 
 /* Info boxes */
@@ -114,12 +114,12 @@ img {
 }
 
 .info-box-info {
-    border-image: url("/src/public/assets/box_info.png") 32 / 32px round;
+    border-image: url("/assets/box_info.png") 32 / 32px round;
     color: var(--clr-info);
 }
 
 .info-box-warning {
-    border-image: url("/src/public/assets/box_warning.png") 32 / 32px round;
+    border-image: url("/assets/box_warning.png") 32 / 32px round;
     color: var(--clr-warning);
 }
 
@@ -128,10 +128,10 @@ img {
     position: relative;
     padding: var(--gap-md);
     width: 100%;
-    border-image: url("/src/public/assets/input_base.png") 31 / 31px round;
+    border-image: url("/assets/input_base.png") 31 / 31px round;
 }
 .input-wrapper:has(input:focus-visible) {
-    border-image: url("/src/public/assets/input_base_focus.png") 32 / 32px round;
+    border-image: url("/assets/input_base_focus.png") 32 / 32px round;
 }
 .input-wrapper::after {
     content: "";
@@ -213,7 +213,7 @@ img {
 }
 
 .sect {
-    border-image: url(/src/public/assets/section.png) 32 / 32px round;
+    border-image: url(/assets/section.png) 32 / 32px round;
     padding: var(--gap-md) var(--gap-md);
 }
 

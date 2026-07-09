@@ -9,7 +9,7 @@ interface SeparatorProps {
 export default function Separator(props: SeparatorProps) {
   return <div class={`my-6 flex px-2 w-full justify-center items-center ${props.class || ""}`}>
     <img
-      src="/src/public/assets/separator.png"
+      src="/assets/separator.png"
       class="mr-2 w-fit h-6 select-none"
       alt="------------"
       aria-hidden
@@ -18,7 +18,7 @@ export default function Separator(props: SeparatorProps) {
       {props.children}
     </strong>
     <img
-      src="/src/public/assets/separator.png"
+      src="/assets/separator.png"
       class="ml-2 w-fit h-6 -scale-x-100 select-none"
       alt="------------"
       aria-hidden

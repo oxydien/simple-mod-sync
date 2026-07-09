@@ -6,7 +6,7 @@ export default function AppHeader() {
   return (
     <header class="hidden md:flex flex-row justify-between items-center gap-2 border-b-sep py-1 px-4 mb-6">
       <a href="/">
-        <img src="/src/public/assets/banner.png" alt="Simple Mod Sync" class="app-header" />
+        <img src="/assets/banner.png" alt="Simple Mod Sync" class="app-header" />
       </a>
       <menu class="flex gap-1 list-none">
         <li>

@@ -24,16 +24,17 @@ export default function SelectEnvironmentSection(props: SelectEnvironmentSection
   const [showSnapshots, setShowSnapshots] = createSignal<boolean>(false); // not mounted to anything
   const [versions, setVersions] = createSignal<VersionWrapper[]>([]);
 
-  const [selectedVersion, setSelectedVersion] = createSignal<AnyGameVersion>();
+  const [selectedVersion, setSelectedVersion] = createSignal<VersionWrapper>();
   const [selectedLoader, setSelectedLoader] = createSignal<LoaderType>(LOADER_TYPES[0]);
 
-  const showVersions = createMemo((): AnyGameVersion[] => {
+  const showVersionsWrappers = createMemo((): VersionWrapper[] => {
     return versions().map((version) => {
-      if (showSnapshots()) return version.version;
-      if (version.type === "release") return version.version;
+      if (showSnapshots()) return version;
+      if (version.type === "release") return version;
       return null;
     }).filter((f) => f != null);
   });
+  const showVersions = createMemo((): AnyGameVersion[] => showVersionsWrappers().map((version) => version.version));
 
   onMount(async () => {
     setIsLoading(true);
@@ -41,7 +42,7 @@ export default function SelectEnvironmentSection(props: SelectEnvironmentSection
     setIsLoading(false);
     if (res.data && res.data.length > 0) {
       setVersions(res.data);
-      setSelectedVersion(res.data[0])
+      setSelectedVersion(showVersionsWrappers()[0] || null)
       return;
     }
   });
@@ -49,7 +50,7 @@ export default function SelectEnvironmentSection(props: SelectEnvironmentSection
   const handleSave = () => {
     props.onEnvironment({
       mc_loader: selectedLoader(),
-      mc_version: selectedVersion()
+      mc_version: selectedVersion()!.version
     })
   }
 
@@ -64,6 +65,7 @@ export default function SelectEnvironmentSection(props: SelectEnvironmentSection
           <select
             class="border-sep p-2"
             onChange={(e) => setSelectedVersion(e.target.value as AnyGameVersion)}
+            value={selectedVersion()?.version}
           >
             <For each={showVersions()}>
               {(ver) => <option value={ver}>{ver}</option>}
@@ -90,6 +92,7 @@ export default function SelectEnvironmentSection(props: SelectEnvironmentSection
         <Button
           class="save"
           variant="primary"
+          disabled={!showVersions()}
           onClick={handleSave}
         >
           Continue

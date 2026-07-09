@@ -13,6 +13,10 @@
     "moduleResolution": "bundler",
     "noEmit": true,
 
+    "paths": {
+      "/assets/*": ["./public/assets/"]
+    },
+
     // Type Checking & Safety
     "strict": true,
     "types": ["vite/client"]

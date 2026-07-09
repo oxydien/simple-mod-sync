@@ -6,5 +6,5 @@ interface IconProps {
 }
 
 export default function Icon(props: IconProps) {
-  return <img src={`/src/public/assets/icons/${props.name}.png`} alt={`${props.name} icon`} style={{ width: "1em", height: "1em" }} class={props.class} aria-hidden />
+  return <img src={`/assets/icons/${props.name}.png`} alt={`${props.name} icon`} style={{ width: "1em", height: "1em" }} class={props.class} aria-hidden />
 }

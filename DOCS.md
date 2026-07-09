@@ -39,6 +39,8 @@
 > [!TIP]
 > While knowing how this system works is still recommended, if you don't want to 
 > do everything manually, there are **scripts that automate this process are [here](./translators/README.md).**
+>
+> There is also **[a website](https://sms.oxydien.dev/)** that can **generate the schema sync file**.
 
 Open any text editor (Notepad, TextEdit, etc.) and paste this template:
 

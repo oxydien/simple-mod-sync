@@ -1,10 +1,10 @@
 
 @font-face {
     font-family: "pixel-font";
-    src: url("/src/public/assets/fonts/fusion-pixel-10px-proportional-latin.otf.woff2") format("woff2");
+    src: url("/assets/fonts/fusion-pixel-10px-proportional-latin.otf.woff2") format("woff2");
 }
 
 @font-face {
     font-family: "mono-pixel-font";
-    src: url("/src/public/assets/fonts/fusion-pixel-12px-monospaced-latin.otf.woff2") format("woff2");
+    src: url("/assets/fonts/fusion-pixel-12px-monospaced-latin.otf.woff2") format("woff2");
 }

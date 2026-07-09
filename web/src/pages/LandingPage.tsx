@@ -104,7 +104,7 @@ export default function LandingPage(props: LandingPageProps) {
         </ul>
 
         <img
-          src="/src/public/assets/screens/content-overview.png"
+          src="/assets/screens/content-overview.png"
           alt="Content overview screen"
           class="mt-2"
         />
@@ -122,7 +122,7 @@ export default function LandingPage(props: LandingPageProps) {
         </p>
 
         <img
-          src="/src/public/assets/screens/settings.png"
+          src="/assets/screens/settings.png"
           alt="Settings screen"
           class="mt-2"
         />
@@ -138,7 +138,7 @@ export default function LandingPage(props: LandingPageProps) {
           If content has been updated when you try to play, you will be prompted to restart the game before joining.
         </p>
         <img
-          src="/src/public/assets/screens/game-update.png"
+          src="/assets/screens/game-update.png"
           alt="Game requires restart popup"
           class="mt-2"
         />
