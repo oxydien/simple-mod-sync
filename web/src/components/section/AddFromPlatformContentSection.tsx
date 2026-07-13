@@ -12,7 +12,7 @@ import PlatformSelectContentTypeSection from "./PlatformSelectContentTypeSection
 
 
 interface AddContentFromPlatformSectionProps {
-  env: SyncEnvironment;
+  env: SyncEnvironment | null;
   onInsert?: (content: ExtendedContent) => void;
 }
 

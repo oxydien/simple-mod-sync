@@ -28,7 +28,7 @@ export class SchemaGenerator {
     return await this.versionResolver.getVersions();
   }
 
-  createDefault(env: SyncEnvironment): ExtendedSyncSchema {
+  createDefault(env: SyncEnvironment | null): ExtendedSyncSchema {
     return {
       "$comment_update_at": links.this,
       "$schema": links.sms_schema,

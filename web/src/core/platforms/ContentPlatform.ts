@@ -17,12 +17,12 @@ export abstract class ContentPlatform {
   abstract isAvailable(): Promise<ResultData<boolean>>;
 
   /** Searches platform for content matching the query, type, and environment. */
-  abstract search(query: string, type: ContentType, environment: SyncEnvironment, page: number)
+  abstract search(query: string, type: ContentType, environment: SyncEnvironment | null, page: number)
     : Promise<ResultData<PaginatedData<PlatformContent>>>;
 
   /** Searches platform for all files for given content and environment.
    * Note that the content has to be fetched from the same platform. */
-  abstract getVersionsFor(content: PlatformContent, contentType: ContentType, environment: SyncEnvironment)
+  abstract getVersionsFor(content: PlatformContent, contentType: ContentType, environment: SyncEnvironment | null)
     : Promise<ResultData<PlatformFile[]>>;
 
 

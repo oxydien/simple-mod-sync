@@ -89,6 +89,12 @@ img {
 .btn.btn-default:hover:not(:disabled), .btn.btn-default:focus-visible:not(:disabled) {
     border-image: url("/assets/button_base_hover.png") 32 / 32px round;
 }
+.btn.btn-destructive {
+    border-image: url("/assets/button_destructive.png") 32 / 32px round;
+}
+.btn.btn-destructive:hover:not(:disabled), .btn.btn-destructive:focus-visible:not(:disabled) {
+    border-image: url("/assets/button_destructive_hover.png") 32 / 32px round;
+}
 .btn.btn-primary {
     border-image: url("/assets/button_primary.png") 32 / 32px round;
 }
@@ -181,7 +187,7 @@ img {
     width: 100%;
     overflow: hidden;
     z-index: -1;
-    filter: brightness(0.5) grayscale(0.3);
+    filter: brightness(0.7) grayscale(0.3);
     inset: 0;
 }
 .object_spawner > * {

@@ -16,6 +16,7 @@ import {
   ModrinthVersion,
 } from "../../types/modrinth";
 import PlatformFile from "../../types/abstraction/PlatformFile";
+import {MC_LOADER_UNKNOWN, MC_VERSION_UNKNOWN} from "../../constants";
 
 const MODRINTH_PAGE_SIZE = 50;
 
@@ -54,7 +55,7 @@ export default class ModrinthPlatform extends ContentPlatform {
   }
 
   /** Searches Modrinth for content matching the query, type, and environment. */
-  search(query: string, type: ContentType, environment: SyncEnvironment, page: number): Promise<ResultData<PaginatedData<PlatformContent>>> {
+  search(query: string, type: ContentType, environment: SyncEnvironment | null, page: number): Promise<ResultData<PaginatedData<PlatformContent>>> {
     const facets = this.createFacets(type, environment);
     const offset = page * MODRINTH_PAGE_SIZE;
 
@@ -84,16 +85,19 @@ export default class ModrinthPlatform extends ContentPlatform {
     })
   }
 
-  getVersionsFor(content: PlatformContent, contentType: ContentType, environment: SyncEnvironment): Promise<ResultData<PlatformFile[]>> {
+  getVersionsFor(content: PlatformContent, contentType: ContentType, environment: SyncEnvironment | null): Promise<ResultData<PlatformFile[]>> {
     const slug = content.slug;
-    const loaders = `["${environment.mc_loader}"]`;
-    const gameVersions = `["${environment.mc_version}"]`
 
     const url = this.resolve("version", {"slug": slug});
-    if (contentType === "mod")
-      url.searchParams.set("loaders", loaders);
-    url.searchParams.set("game_versions", gameVersions);
     url.searchParams.set("include_changelog", "false");
+
+    if (environment) {
+      const loaders = `["${environment.mc_loader}"]`;
+      const gameVersions = `["${environment.mc_version}"]`
+      if (contentType === "mod")
+        url.searchParams.set("loaders", loaders);
+      url.searchParams.set("game_versions", gameVersions);
+    }
 
     return new Promise(async (resolve, _) => {
       const res = await apiGet<ModrinthResponse<ModrinthVersion[]>>(url);
@@ -144,16 +148,21 @@ export default class ModrinthPlatform extends ContentPlatform {
   }
 
   /** Builds the Modrinth search facets for the given content type and environment. */
-  createFacets(type: ContentType, environment: SyncEnvironment): ModrinthFacets {
+  createFacets(type: ContentType, environment: SyncEnvironment | null): ModrinthFacets {
     const typeFacet: ModrinthFacetPair = [`project_type:${this.mapLocalContentType(type)}`];
-    const versionFacet: ModrinthFacetPair = [`versions:${environment.mc_version}`];
 
-    if (type === "mod") {
-      const loaderFacet: ModrinthFacetPair = [`categories:${environment.mc_loader}`];
-      return [typeFacet, versionFacet, loaderFacet];
+    if (environment) {
+      const versionFacet: ModrinthFacetPair = [`versions:${environment.mc_version}`];
+
+      if (type === "mod") {
+        const loaderFacet: ModrinthFacetPair = [`categories:${environment.mc_loader}`];
+        return [typeFacet, versionFacet, loaderFacet];
+      }
+
+      return [typeFacet, versionFacet];
     }
 
-    return [typeFacet, versionFacet];
+    return [typeFacet];
   }
 
   /** Maps a Modrinth project type to the local content type. Kept separate in case the two diverge later. */
@@ -181,7 +190,7 @@ export default class ModrinthPlatform extends ContentPlatform {
     }
   }
 
-  mapModrinthVersion(version: ModrinthVersion, environment: SyncEnvironment): PlatformFile {
+  mapModrinthVersion(version: ModrinthVersion, environment: SyncEnvironment | null): PlatformFile {
     let file = version.files.find(e => e.primary);
     if (!file) {
       file = version.files[0];
@@ -191,8 +200,8 @@ export default class ModrinthPlatform extends ContentPlatform {
       name: `${version.name} ${version.version_number}`,
       file_url: file.url,
       version: version.id,
-      mc_loaders: version.loaders || [environment.mc_loader],
-      mc_versions: version.game_versions || [environment.mc_version],
+      mc_loaders: version.loaders || [environment?.mc_loader || MC_LOADER_UNKNOWN],
+      mc_versions: version.game_versions || [environment?.mc_version || MC_VERSION_UNKNOWN],
     };
   }
 }

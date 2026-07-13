@@ -13,6 +13,7 @@ import {
   CurseForgeFile,
 } from "../../types/curseforge";
 import PlatformFile from "../../types/abstraction/PlatformFile";
+import {MC_LOADER_UNKNOWN, MC_VERSION_UNKNOWN} from "../../constants";
 
 const MINECRAFT_GAME_ID = 432;
 
@@ -101,7 +102,7 @@ export default class CursePlatform extends ContentPlatform {
   }
 
   /** Searches CurseForge for content matching the query, type, and environment. */
-  search(query: string, type: ContentType, environment: SyncEnvironment, page: number): Promise<ResultData<PaginatedData<PlatformContent>>> {
+  search(query: string, type: ContentType, environment: SyncEnvironment | null, page: number): Promise<ResultData<PaginatedData<PlatformContent>>> {
     const classId = this.mapLocalContentType(type);
     const index = page * CURSE_PAGE_SIZE;
 
@@ -110,11 +111,15 @@ export default class CursePlatform extends ContentPlatform {
     url.searchParams.set("classId", classId.toString());
     url.searchParams.set("searchFilter", query);
     url.searchParams.set("sortField", "6");
-    url.searchParams.set("gameVersion", environment.mc_version);
-    if (type === "mod")
-      url.searchParams.set("modLoaderType", LOADER_ID[environment.mc_loader as LoaderType].toString());
+    url.searchParams.set("sortOrder", "desc");
     url.searchParams.set("index", index.toString());
     url.searchParams.set("pageSize", CURSE_PAGE_SIZE.toString());
+
+    if (environment) {
+      url.searchParams.set("gameVersion", environment.mc_version);
+      if (type === "mod")
+        url.searchParams.set("modLoaderType", LOADER_ID[environment.mc_loader as LoaderType].toString());
+    }
 
     return new Promise(async (resolve, _) => {
       const res = await apiGet<CurseForgeSearchResponse>(url);
@@ -134,14 +139,17 @@ export default class CursePlatform extends ContentPlatform {
     });
   }
 
-  getVersionsFor(content: PlatformContent, contentType: ContentType, environment: SyncEnvironment): Promise<ResultData<PlatformFile[]>> {
+  getVersionsFor(content: PlatformContent, contentType: ContentType, environment: SyncEnvironment | null): Promise<ResultData<PlatformFile[]>> {
     const curseForgeProject = content.platform_info as CurseForgeProject;
 
     const url = this.resolve("files", { "modId": curseForgeProject.id.toString() });
-    url.searchParams.set("gameVersion", environment.mc_version);
-    if (contentType === "mod")
-      url.searchParams.set("modLoaderType", LOADER_ID[environment.mc_loader as LoaderType].toString());
     url.searchParams.set("pageSize", CURSE_PAGE_SIZE.toString());
+
+    if (environment) {
+      url.searchParams.set("gameVersion", environment.mc_version);
+      if (contentType === "mod")
+        url.searchParams.set("modLoaderType", LOADER_ID[environment.mc_loader as LoaderType].toString());
+    }
 
     return new Promise(async (resolve, _) => {
       const res = await apiGet<CurseForgeModFilesResponse>(url);
@@ -204,13 +212,13 @@ export default class CursePlatform extends ContentPlatform {
     };
   }
 
-  mapCurseFile(file: CurseForgeFile, environment: SyncEnvironment): PlatformFile {
+  mapCurseFile(file: CurseForgeFile, environment: SyncEnvironment | null): PlatformFile {
     return {
       name: file.displayName,
       file_url: file.downloadUrl,
       version: file.id.toString(),
-      mc_loaders: [environment.mc_loader],
-      mc_versions: file.gameVersions || [environment.mc_version],
+      mc_loaders: [environment?.mc_loader || MC_LOADER_UNKNOWN],
+      mc_versions: file.gameVersions || [environment?.mc_version || MC_VERSION_UNKNOWN],
     };
   }
 }

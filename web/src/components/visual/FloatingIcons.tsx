@@ -45,6 +45,7 @@ export default function FloatingIcons() {
     const iconName = iconList[
       Math.floor(Math.random() * iconList.length)
     ];
+    const opacity = Math.random() * 0.5 + 0.2;
 
     return (
       <div
@@ -54,7 +55,8 @@ export default function FloatingIcons() {
           top: `${newPosition.y}%`,
           left: `${newPosition.x}%`,
           "animation-delay": `${Math.random() * -2}s`,
-          opacity: Math.random() * 0.5 + 0.2,
+          opacity,
+          "font-size": `${opacity * 2}em`,
           "z-index": -1,
           "box-sizing": "revert",
         }}

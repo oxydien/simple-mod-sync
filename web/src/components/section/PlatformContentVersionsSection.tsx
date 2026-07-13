@@ -15,7 +15,7 @@ interface PlatformContentVersionsSectionProps {
   platformKey: ContentPlatformKey;
   content: PlatformContent;
   contentType: ContentType;
-  environment: SyncEnvironment;
+  environment: SyncEnvironment | null;
   onSelected?: (file: PlatformFile) => void;
 }
 

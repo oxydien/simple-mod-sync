@@ -6,6 +6,7 @@ import Button from "../common/Button";
 import Icon from "../common/Icon";
 import {sms} from "../../core/SchemaGenerator";
 import Important from "../info/Important";
+import {info, warn} from "../../core/log";
 
 let AVAILABLE_PLATFORMS_CACHE: ContentPlatformKey[] = [];
 let HAS_FETCHED: boolean = false;
@@ -46,12 +47,12 @@ export default function SelectPlatformSection(props: SelectPlatformSectionProps)
 
       platformProvider.getAvailable()
         .then(res => {
-          console.log("Loaded content platforms: ", res);
+          info("Platform load", "Loaded content platforms: ", res);
           AVAILABLE_PLATFORMS_CACHE = res;
           loadFromCache();
         })
         .catch((err) => {
-          console.error("Error while loading content platforms", err);
+          warn("Platform load", "Error while loading content platforms", err);
         })
         .finally(() => {
           setIsLoading(false);
@@ -69,7 +70,7 @@ export default function SelectPlatformSection(props: SelectPlatformSectionProps)
       <div class="flex flex-col gap-1 w-full">
         <Important>Select platform for searching:</Important>
         <div class="flex flex-wrap gap-2 w-full">
-          <For each={platforms()}>
+          <For each={platforms()} fallback={<p>No platform found</p>}>
             {(entry: ContentPlatformEntry) => (
               <Button
                 variant={props.value === entry.key ? "primary" : "default"}

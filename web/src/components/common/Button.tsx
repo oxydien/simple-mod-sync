@@ -3,7 +3,7 @@ import Icon from "./Icon";
 
 interface ButtonProps {
   children?: JSX.Element;
-  variant?: "default" | "primary";
+  variant?: "default" | "primary" | "destructive";
   onClick?: () => void;
   disabled?: boolean;
   type?: "button" | "submit" | "reset";

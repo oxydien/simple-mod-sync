@@ -7,6 +7,7 @@ import LoadingMessage from "../info/LoadingMessage";
 import ExtendedSyncSchema from "../../core/types/sms/extensions/ExtendedSyncSchema";
 import SelectEnvironmentSection from "./SelectEnvironmentSection";
 import SyncEnvironment from "../../core/types/SyncEnvironment";
+import {debug, info, warn} from "../../core/log";
 
 interface GeneratorStartSectionProps {
   onLoad: (file: ExtendedSyncSchema) => void;
@@ -23,7 +24,10 @@ export default function GeneratorStartSection(props: GeneratorStartSectionProps)
 
   async function parseFile(file: File) {
     const smsParser = parsers.getParser("sms");
+
+    debug("ParseFile", "Parsing file", file, "parser:", smsParser);
     if (!smsParser) {
+      warn("ParseFile", "Missing parser for file", file);
       setParseError("No parser found.");
       return;
     }
@@ -32,11 +36,12 @@ export default function GeneratorStartSection(props: GeneratorStartSectionProps)
     const res = await smsParser.parseFile(file);
     setIsParsing(false);
     if (!res.data) {
+      warn("ParseFile", "Parser failed for file:", file, "Error:", res.error);
       setParseError(res.error || null);
       return;
     }
 
-    console.log("Parsing succeeded", res.data);
+    info("ParseFile", "Parsing success:", res.data);
     if (!("environment" in res.data)) {
       setShowEnv(true);
       setSchema(res.data);
@@ -54,11 +59,13 @@ export default function GeneratorStartSection(props: GeneratorStartSectionProps)
   }
 
   const handleCreateFile = () => {
+    debug("handleCreateFile", "Asking for environment");
     setShowEnv(true);
   }
 
-  const handleEnvSelected = (env: SyncEnvironment) => {
+  const handleEnvSelected = (env: SyncEnvironment | null) => {
     let res: ExtendedSyncSchema;
+    debug("handleEnvSelected", "Selected environment", env);
     if (schema()) {
       res = { ...schema()!, environment: env }
     } else {

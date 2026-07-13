@@ -6,6 +6,6 @@ import ExtendedContent from "./ExtendedContent";
 export default interface ExtendedSyncSchema extends SyncSchema {
   $schema?: string;
   $comment_update_at?: string,
-  environment?: SyncEnvironment;
+  environment?: SyncEnvironment | null;
   sync: ExtendedContent[];
 }

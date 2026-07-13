@@ -6,9 +6,12 @@ import build from "./func/build";
 import Important from "./components/info/Important";
 import LandingPage from "./pages/LandingPage";
 import GeneratorPage from "./pages/GeneratorPage";
+import {warn} from "./core/log";
 
 const App: Component = () => {
   const [route, setRoute] = createSignal("");
+
+  warn("APP", "This app is still in development. Use the console to find bugs and weird behaviour.")
 
   const isGenerator = location.hash.includes("generator");
   if (isGenerator) {

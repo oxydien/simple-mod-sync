@@ -15,7 +15,7 @@ const CONTENT_SEARCH_DELAY_MS = 600;
 
 interface PlatformContentSearchSectionProps {
   platformKey: ContentPlatformKey;
-  env: SyncEnvironment;
+  env: SyncEnvironment | null;
   contentType: ContentType;
   onAdd: (content: PlatformContent) => void;
 }

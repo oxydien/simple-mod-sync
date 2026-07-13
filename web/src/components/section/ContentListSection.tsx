@@ -10,6 +10,7 @@ interface ContentListSectionProps {
   file: ExtendedSyncSchema,
   onAction: (action: string) => void,
   onEntryFieldChange: (index: number, field: keyof ExtendedContent, value: string | undefined) => void;
+  onRemove: (index: number) => void;
 }
 
 export default function ContentListSection(props: ContentListSectionProps) {
@@ -25,6 +26,11 @@ export default function ContentListSection(props: ContentListSectionProps) {
     }
     arr.push(idx);
     setExpanded(arr);
+  }
+
+  const handleRemoved = (idx: number) => {
+    props.onRemove(idx);
+    handleToggleExpanded(idx);
   }
 
   return <div class="flex flex-col gap-2">
@@ -56,6 +62,7 @@ export default function ContentListSection(props: ContentListSectionProps) {
           entry={entry}
           expanded={expanded().includes(idx())}
           onExpand={() => handleToggleExpanded(idx())}
+          onRemove={() => handleRemoved(idx())}
           onFieldChange={(field, value) => props.onEntryFieldChange(idx(), field, value)}
         />}
       </For>

@@ -19,6 +19,7 @@ interface ContentWidgetProps {
   entry: Content | ExtendedContent;
   expanded: boolean;
   onExpand?: () => void;
+  onRemove?: () => void;
   onFieldChange(field: "url" | "name", value: string): void;
   onFieldChange(field: "version" | "directory", value: string | undefined): void;
   onFieldChange(field: "type", value: ContentType): void;
@@ -157,6 +158,21 @@ export default function ContentWidget(props: ContentWidgetProps) {
                 }
               />
             </label>
+          </Show>
+
+          <Show when={props.onRemove}>
+            <div>
+              <p class="leading-5 text-sm my-2">
+                This button removes the entry from the sync file, the content might still be present on clients computers.<br />
+                If you wish to remove the files from the clients computer, leave the url empty or create a modify entry.
+              </p>
+              <Button
+                  variant="destructive"
+                  onClick={props.onRemove}
+              >
+                Remove
+              </Button>
+            </div>
           </Show>
         </div>
       </Show>

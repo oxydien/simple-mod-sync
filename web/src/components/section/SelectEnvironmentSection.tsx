@@ -7,6 +7,8 @@ import AnyGameVersion from "../../core/types/GameVersion";
 import Important from "../info/Important";
 import Button from "../common/Button";
 import SyncEnvironment from "../../core/types/SyncEnvironment";
+import {debug, info} from "../../core/log";
+import Icon from "../common/Icon";
 
 
 const LOADER_TYPES: LoaderType[] = [
@@ -16,7 +18,7 @@ const LOADER_TYPES: LoaderType[] = [
 ];
 
 interface SelectEnvironmentSectionProps {
-  onEnvironment: (SyncEnvironment: SyncEnvironment) => void;
+  onEnvironment: (SyncEnvironment: SyncEnvironment | null) => void;
 }
 
 export default function SelectEnvironmentSection(props: SelectEnvironmentSectionProps) {
@@ -24,7 +26,7 @@ export default function SelectEnvironmentSection(props: SelectEnvironmentSection
   const [showSnapshots, setShowSnapshots] = createSignal<boolean>(false); // not mounted to anything
   const [versions, setVersions] = createSignal<VersionWrapper[]>([]);
 
-  const [selectedVersion, setSelectedVersion] = createSignal<VersionWrapper>();
+  const [selectedVersion, setSelectedVersion] = createSignal<AnyGameVersion>();
   const [selectedLoader, setSelectedLoader] = createSignal<LoaderType>(LOADER_TYPES[0]);
 
   const showVersionsWrappers = createMemo((): VersionWrapper[] => {
@@ -38,19 +40,30 @@ export default function SelectEnvironmentSection(props: SelectEnvironmentSection
 
   onMount(async () => {
     setIsLoading(true);
+    info("Load versions", "Making request");
     const res = await sms().getVersions();
     setIsLoading(false);
     if (res.data && res.data.length > 0) {
+      info("Load versions", "Loaded versions:", res.data.length);
       setVersions(res.data);
-      setSelectedVersion(showVersionsWrappers()[0] || null)
+      if (showVersionsWrappers().length > 0) {
+        debug("Load versions", "Selecting default version:", showVersionsWrappers()[0]);
+        setSelectedVersion(showVersionsWrappers()[0].version)
+      } else {
+        setSelectedVersion(null);
+      }
       return;
     }
   });
 
+  const handleSkip = () => {
+    props.onEnvironment(null);
+  }
+
   const handleSave = () => {
     props.onEnvironment({
       mc_loader: selectedLoader(),
-      mc_version: selectedVersion()!.version
+      mc_version: selectedVersion()
     })
   }
 
@@ -65,14 +78,14 @@ export default function SelectEnvironmentSection(props: SelectEnvironmentSection
           <select
             class="border-sep p-2"
             onChange={(e) => setSelectedVersion(e.target.value as AnyGameVersion)}
-            value={selectedVersion()?.version}
+            value={selectedVersion()}
           >
             <For each={showVersions()}>
               {(ver) => <option value={ver}>{ver}</option>}
             </For>
           </select>
-          <small>
-            Note that Simple Mod Sync might not have a release version for all these minecraft versions.
+          <small class="mt-1">
+            <strong>Note:</strong> Simple Mod Sync might not have a release version for all these minecraft versions.
           </small>
         </div>
         <div class="flex flex-col">
@@ -89,14 +102,23 @@ export default function SelectEnvironmentSection(props: SelectEnvironmentSection
           </select>
         </div>
 
-        <Button
-          class="save"
-          variant="primary"
-          disabled={!showVersions()}
-          onClick={handleSave}
-        >
-          Continue
-        </Button>
+        <nav class="flex flex-col md:flex-row gap-2">
+          <Button
+              class="skip"
+              variant="default"
+              onClick={handleSkip}
+          >
+            Skip
+          </Button>
+          <Button
+              class="save"
+              variant="primary"
+              disabled={!showVersions()}
+              onClick={handleSave}
+          >
+            Continue
+          </Button>
+        </nav>
       </div>
     </Show>
   </div>)

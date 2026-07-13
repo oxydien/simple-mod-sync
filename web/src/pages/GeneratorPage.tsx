@@ -7,6 +7,7 @@ import AddContentManuallySection from "../components/section/AddContentManuallyS
 import Button from "../components/common/Button";
 import ExtendedContent from "../core/types/sms/extensions/ExtendedContent";
 import ExportSchemaSection from "../components/section/ExportSchemaSection";
+import {info} from "../core/log";
 
 
 export default function GeneratorPage() {
@@ -18,6 +19,7 @@ export default function GeneratorPage() {
 
   const handleInsertContent = (content: ExtendedContent) => {
     setFile(prev => ({...prev!, sync: [content, ...prev!.sync]}))
+    info("Insert content", "Inserted content to sync entries:", content)
   }
 
   const handleInsertAction = (content: ExtendedContent) => {
@@ -37,6 +39,18 @@ export default function GeneratorPage() {
         )
       };
     });
+  };
+
+  const handleRemoveSyncEntry = (idx: number) => {
+    setFile(prev => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        sync: prev.sync.filter((_, i) => i !== idx)
+      };
+    });
+    info("Remove content", "Removed content from sync entries:", idx)
   };
 
 
@@ -59,7 +73,7 @@ export default function GeneratorPage() {
 
       <Match when={action() === "add_platform"}>
         <Button onClick={() => handleSetAction("")}>
-          Back to content list
+          Back to your file
         </Button>
         <AddContentFromPlatformSection
           env={file()!.environment!}
@@ -71,6 +85,7 @@ export default function GeneratorPage() {
         <ContentListSection
           file={file()!}
           onAction={handleSetAction}
+          onRemove={handleRemoveSyncEntry}
           onEntryFieldChange={handleEntryFieldChange}
         />
         <ExportSchemaSection schema={file()!} ref={exportSectRef} />
