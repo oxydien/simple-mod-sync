@@ -27,3 +27,7 @@ gitignore
 # System Files
 .DS_Store
 Thumbs.db
+
+.dev.vars*
+!.dev.vars.example
+!.env.example
