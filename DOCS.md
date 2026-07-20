@@ -2,7 +2,7 @@
 
 **Table of contents**
 <!--toc:start-->
-- [Simple Mod Sync - User Guide](#simple-mod-sync-user-guide)
+- [Simple Mod Sync - User Guide](#simple-mod-sync---user-guide)
   - [Quick Start Guide](#quick-start-guide)
     - [Step 1: Create Your Sync File](#step-1-create-your-sync-file)
     - [Step 2: Add Your First Mod](#step-2-add-your-first-mod)
@@ -28,6 +28,7 @@
     - [File Modifications](#file-modifications)
     - [Remove Files](#remove-files)
     - [Rename/Move Files](#renamemove-files)
+  - [FAQ: Frequently Asked Questions](#faq-frequently-asked-questions)
 <!--toc:end-->
 
 ---
@@ -78,7 +79,7 @@ Let's add Sodium as an example. Between the square brackets `[ ]`, add:
 ```
 
 > Note that the URL is only as example, look at [From Modrinth](#from-modrinth) or 
-> [From Curseforge](#from-curseforge) to get your own URL.
+> [From CurseForge](#from-curseforge) to get your own URL.
 
 **What each part means:**
 - `url` - Where to download the file from
@@ -116,10 +117,10 @@ To add more items, put a comma `,` after the closing `}` and add another item:
 
 1. Upload your `.json` file to a sharing service:
    - **Pastebin**: Go to pastebin.com, paste your file, save, and use the "raw" link
-   - **GitHub Gist**: Create a gist at gist.github.com and use the "raw" link
+   - **GitHub Gist**: Create a gist at `gist.github.com` and use the "raw" link
      - Url should look like `https://gist.githubusercontent.com/YOUR_USER/SOME_RANDOM_LETTERS/raw/FILE_NAME.json`
      - Note that when you copy GIST raw link there is second random letters part that you have to remove [source](https://stackoverflow.com/questions/46073096/is-there-a-permalink-to-the-latest-version-of-gist-files#47175630)
-     - Also note that Github GIST has a 5-minute cache for requests, so it might take some time for your update to take effect
+     - Also note that GitHub GIST has a 5-minute cache for requests, so it might take some time for your update to take effect
    - **Your own website**: Upload it anywhere and link directly to the file
 
 2. Make sure the link shows **only the text** (no website design around it)
@@ -226,7 +227,7 @@ Goes into your `shaderpacks` folder.
 ```json
 {
   "url": "https://example.com/datapack.zip",
-  "name": "Custom Worldgen",
+  "name": "Custom World Generation",
   "version": "3.0",
   "type": "datapack"
 }
@@ -281,7 +282,7 @@ https://cdn.modrinth.com/data/PROJECT/versions/VERSION/filename.jar?some_garbage
 
 ### From CurseForge
 
-1. Go to the mod/content page on Curseforge
+1. Go to the mod/content page on CurseForge
 2. Click on the **Files** tab
 3. Find the version you want
 4. Click the **Download file** button (under the 3 dots button)
@@ -397,7 +398,7 @@ Here's a full sync file with different types of content:
 
 **Version** - A text label that helps track which version of a mod you're using. Change this when you update the URL.
 
-**Type** - Tells Simple Mod Sync where to put the downloaded file (mods folder, resourcepacks folder, etc.).
+**Type** - Tells Simple Mod Sync where to put the downloaded file (mods folder, resource-packs folder, etc.).
 
 **Packed Content** - A ZIP file that gets extracted into a specific folder you choose.
 
@@ -416,7 +417,7 @@ The `modify` section lets you automatically remove or rename files in the game i
 Modifications run **in order** you put them into the `modify` list.
 
 **Structure:**
-```json
+```json5
 {
   "sync_version": 3,
   "sync": [
@@ -467,7 +468,7 @@ This might be useful when you removed a mod from your modpack.
 }
 ```
 
-This removes any file in the mods folder starting with "oldmod-" and ending with ".jar".
+This removes any file in the mods folder starting with `oldmod-` and ending with `.jar`.
 
 ### Rename/Move Files
 
@@ -551,6 +552,33 @@ options.txt
 ```
 
 This sync file downloads Sodium and cleans up the user cache and old log files.
+
+## FAQ: Frequently Asked Questions
+
+### CurseForge constraints (Domain not allowed)
+
+**Fix:** Download the version from **Modrinth** instead: https://modrinth.com/mod/simple-mod-sync
+
+**What does this mean?**
+
+Simple Mod Sync can’t download files from certain sources because CurseForge has some pretty strict (and honestly annoying) 
+rules in order to *"keep the platform safe"*.
+
+So SMS only allows downloads from *"verified repositories"*.
+
+As a result, SMS versions with the `_CF` postfix (for example, `simplemodsync-neoforge-1.21.1-1.4.0_CF.jar`) allow 
+downloading content only from these domains:
+- `forgecdn.net`
+- `curseforge.com`
+- `modrinth.com`
+
+Some related features (like packed content) are also disabled under the same restrictions.
+
+### Does it work with CurseForge mods?
+
+**Yes**. You can either:
+- Follow the instructions in [**“How to get links from CurseForge”**](#from-curseforge), or
+- Use the **web schema generator**: https://sms.oxydien.dev/#generator
 
 ---
 

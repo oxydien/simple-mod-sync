@@ -8,23 +8,53 @@ Simple Mod Sync lets you create a list of mods and other content that can be aut
 
 Think of it like a shopping list, but for Minecraft content. You write down what you want (the URLs to download files), and Simple Mod Sync goes shopping for you.
 
-### Need a video? *(might be outdated)*
+## Resources
 
-[![Watch my video](./.github/assets/oxydien_YT_video.jpg)](https://youtu.be/8SliNfmfpOs)
+<table>
+<tr>
+  <th>
+    Need a video? (might be outdated)
+  </th>
+  <th>
+    Checkout the website
+  </th>
+  <th>
+    How to use  it?
+  </th>
+</tr>
+<tr>
+  <td align="center">
+    <a href="https://youtu.be/8SliNfmfpOs" target="_blank" rel="noreferrer">
+      <p>This video covers the installation process for average minecraft player and basic setup for server owners.</p>
+      <img src="./.github/assets/oxydien_YT_video.jpg" width="180" alt="Watch the video" />
+    </a>
+  </td>
+  
+  <td align="center">
+    <a href="https://sms.oxydien.dev/" target="_blank" rel="noreferrer">
+      <p>The website provides a tool for maintaining your schema file and adding content from various content platforms such as Modrinth and Curseforge.</p>
+      <img src="./.github/assets/WEBSITE_landing.png" width="180" alt="Visit the website" />
+    </a>
+  </td>
 
-## Usage
+  <td align="center">
+    <p>
+      If you are just downloading this mod because somebody sent you, you probably just need to download the mod 
+      (from <a href="https://modrinth.com/mod/simple-mod-sync" target="_blank" rel="noreferrer">Modrinth</a> or <a href="https://github.com/oxydien/simple-mod-sync/actions" target="_blank" rel="noreferrer">GitHub actions</a>),
+      put it into the mods file and be gone.
+    </p>
+    <a href="./DOCS.md" target="_blank" rel="noreferrer">
+      <p>
+        If you are the one hosting the server and/or managing the mods, look into the Docs file.
+      </p>
+    </a>
+  </td>
+</tr>
+</table>
 
-If you are just downloading this mod because somebody sent you, you probably
-just need to download the mod, put it into the mods file and be gone.
+## FAQ: Frequently Asked Questions
 
-If you are the one hosting the server and/or managing the mods, look into the
-[Docs file](./DOCS.md).
-
-### Checkout the website
-
-The website provides a tool for maintaining your schema file and adding content from various content platforms such as Modrinth and Curseforge.
-
-[![Website landing banner](./.github/assets/WEBSITE_landing.png)](https://sms.oxydien.dev/)
+Please visit [this section in the documentation](./DOCS.md#faq-frequently-asked-questions).
 
 ## Found a bug or a crash?
 
