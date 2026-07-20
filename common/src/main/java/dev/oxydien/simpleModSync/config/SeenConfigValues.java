@@ -8,10 +8,12 @@ public class SeenConfigValues implements IConfigCodec {
     private static final String INIT_SCREEN_KEY = "init_screen";
     private static final String SYNC_PROGRESS_POPUP_KEY = "allow_sync_progress_popup";
     private static final String NEEDS_RESTART_POPUP_KEY = "allow_needs_restart_popup";
+    private static final String CURSEFORGE_CONSTRAINTS = "curseforge_constraints";
 
     private boolean initScreen = false;
     private boolean allowSyncInProgressPopups = true;
     private boolean allowGameNeedsRestartPopups = true;
+    private boolean curseforgeConstraints = false;
 
     public static @NotNull SeenConfigValues createDefault() {
         return new SeenConfigValues();
@@ -22,6 +24,7 @@ public class SeenConfigValues implements IConfigCodec {
         parent.addProperty(INIT_SCREEN_KEY, initScreen);
         parent.addProperty(SYNC_PROGRESS_POPUP_KEY, allowSyncInProgressPopups);
         parent.addProperty(NEEDS_RESTART_POPUP_KEY, allowGameNeedsRestartPopups);
+        parent.addProperty(CURSEFORGE_CONSTRAINTS, curseforgeConstraints);
     }
 
     @Override
@@ -51,9 +54,18 @@ public class SeenConfigValues implements IConfigCodec {
         } else
             Log.debug(SeenConfigValues.class, NEEDS_RESTART_POPUP_KEY + " not found or invalid.");
 
+        var curseforgeConstraints = this.curseforgeConstraints;
+        var curseforgeConstraintsAny = parent.get(CURSEFORGE_CONSTRAINTS);
+        if (curseforgeConstraintsAny != null && curseforgeConstraintsAny.isJsonPrimitive()) {
+            var curseforgeConstraintsPrimitive = curseforgeConstraintsAny.getAsJsonPrimitive();
+            curseforgeConstraints = curseforgeConstraintsPrimitive.isBoolean() && curseforgeConstraintsPrimitive.getAsBoolean();
+        } else
+            Log.debug(SeenConfigValues.class, CURSEFORGE_CONSTRAINTS + " not found or invalid.");
+
         this.initScreen = initScreen;
         this.allowSyncInProgressPopups = allowSyncInProgressPopups;
         this.allowGameNeedsRestartPopups = allowGameNeedsRestartPopups;
+        this.curseforgeConstraints = curseforgeConstraints;
     }
 
     public boolean hasVisitedInitScreen() {
@@ -65,6 +77,7 @@ public class SeenConfigValues implements IConfigCodec {
     public boolean isSyncGameNeedsRestartAllowed() {
         return this.allowGameNeedsRestartPopups;
     }
+    public boolean hasVisitedCurseforgeConstraints() { return this.curseforgeConstraints; }
 
     public void setHasVisitedInitScreen(boolean hasVisited) {
         this.initScreen = hasVisited;
@@ -74,5 +87,8 @@ public class SeenConfigValues implements IConfigCodec {
     }
     public void setAllowGameNeedsRestartPopups(boolean allowed) {
         this.allowGameNeedsRestartPopups = allowed;
+    }
+    public void setHasVisitedCurseforgeConstraints(boolean hasVisited) {
+        this.curseforgeConstraints = hasVisited;
     }
 }

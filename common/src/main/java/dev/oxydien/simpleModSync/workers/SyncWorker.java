@@ -67,7 +67,9 @@ public class SyncWorker implements Runnable {
                 return;
             }
 
-            String jsonString = DownloadUtils.downloadString(url);
+            // NOTE: Constraints are disabled here, since it's making a request to make runtime only
+            // JSON string (no file is saved).
+            String jsonString = DownloadUtils.downloadString(url, false);
 
             this.syncStatus.set(SyncStatus.ofState(SyncStatus.SyncState.PARSING));
 

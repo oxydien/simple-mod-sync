@@ -109,7 +109,6 @@ public class ProgressHelper {
             case ResourcePack -> RESOURCEPACK_ICON;
             case ShaderPack ->  SHADER_ICON;
             case DataPack ->   DATAPACK_ICON;
-            case Packed, Config ->  PACKED_ICON;
             default -> UNKNOWN_ICON;
         };
     }

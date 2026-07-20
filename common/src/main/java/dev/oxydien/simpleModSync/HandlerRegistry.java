@@ -5,7 +5,6 @@ import dev.oxydien.simpleModSync.content.ContentTypeUtils;
 import dev.oxydien.simpleModSync.content.handler.ContentHandler;
 import dev.oxydien.simpleModSync.content.handler.GameContentHandler;
 import dev.oxydien.simpleModSync.content.handler.ModContentHandler;
-import dev.oxydien.simpleModSync.content.handler.PackedContentHandler;
 import dev.oxydien.simpleModSync.modification.handler.ModificationHandler;
 import dev.oxydien.simpleModSync.modification.handler.RemoveModificationHandler;
 import dev.oxydien.simpleModSync.modification.handler.RenameModificationHandler;
@@ -45,9 +44,10 @@ public class HandlerRegistry {
         this.contentHandlers.put("datapack", new GameContentHandler("datapacks"));
         this.contentHandlers.put("shader", new GameContentHandler("shaderpacks"));
 
-        ContentHandler packedContentHandler = new PackedContentHandler();
-        this.contentHandlers.put("packed", packedContentHandler);
-        this.contentHandlers.put("config", packedContentHandler);
+        // "packed" and "config"
+        //ContentHandler packedContentHandler = new PackedContentHandler();
+        //this.contentHandlers.put("packed", packedContentHandler);
+        //this.contentHandlers.put("config", packedContentHandler);
 
         this.modificationHandlers.put("remove", new RemoveModificationHandler());
         this.modificationHandlers.put("rename", new RenameModificationHandler());
