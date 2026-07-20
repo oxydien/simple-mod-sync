@@ -7,7 +7,6 @@ public class ContentTypeUtils {
             case ResourcePack -> "resourcepack";
             case ShaderPack -> "shader";
             case DataPack -> "datapack";
-            case Packed, Config -> "packed";
         };
     }
 
@@ -16,7 +15,6 @@ public class ContentTypeUtils {
             case "resourcepack" -> ContentType.ResourcePack;
             case "datapack"  -> ContentType.DataPack;
             case "shader"  -> ContentType.ShaderPack;
-            case "config", "packed" -> ContentType.Packed;
             default -> ContentType.Mod;
         };
     }

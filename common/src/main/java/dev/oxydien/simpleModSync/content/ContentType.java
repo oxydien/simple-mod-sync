@@ -5,6 +5,4 @@ public enum ContentType {
     ResourcePack,
     ShaderPack,
     DataPack,
-    Packed,
-    Config, // Same as Packed
 }

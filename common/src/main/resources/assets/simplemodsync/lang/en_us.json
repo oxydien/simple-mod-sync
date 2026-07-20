@@ -37,5 +37,8 @@
   "simple_mod_sync.ui.modal.go_back": "Go back",
   "simple_mod_sync.ui.modal.ignore": "Ignore",
   "simple_mod_sync.ui.modal.save": "Save",
-  "simple_mod_sync.ui.modal.cancel": "Cancel"
+  "simple_mod_sync.ui.modal.cancel": "Cancel",
+
+  "simple_mod_sync.ui.modal.curseforge_constraints.title": "CurseForge constraints",
+  "simple_mod_sync.ui.modal.curseforge_constraints.content": "You’re using a limited version of this mod!\n\nDue to CurseForge’s undocumented policies, this Simple Mod Sync version doesn’t include all features.\n\n\nPlease check the GitHub (source) page → Docs → FAQ.\n\n\nOnly a small set of domains is allowed for downloading content. The Packed (config) feature is disabled."
 }

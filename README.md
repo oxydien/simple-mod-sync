@@ -1,5 +1,14 @@
 # Simple Mod Sync
 
+> [!IMPORTANT]
+> **You are on the Curseforge constrained version branch**.
+>
+> Due to unwritten curseforge policies that are supposed to *"keep the platform safe"*, Simple Mod Sync cannot allow to download *any* content from *any* source.
+> Only content from *"verified repositories"*; Modrinth or Curseforge is allowed.
+> Thus this version of SMS allows downloading of files only from these domains: `forgecdn.net`, `curseforge.com`, `modrinth.com`.
+>
+> Some features, such as packed content, were also removed due to the same reason.
+
 A simple way to share and sync mods, resource packs, shaders, and other Minecraft content with your friends or community.
 
 ## What is Simple Mod Sync?

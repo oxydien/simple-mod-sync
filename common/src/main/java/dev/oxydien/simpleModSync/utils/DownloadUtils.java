@@ -11,8 +11,8 @@ import java.net.URL;
 import java.util.stream.Collectors;
 
 public class DownloadUtils {
-    public static String downloadString(String uriString) throws IOException, URISyntaxException {
-        HttpURLConnection connection = NetUtils.setupConnectionWithRedirectsTo(uriString);
+    public static String downloadString(String uriString, boolean checkConstraints) throws IOException, URISyntaxException {
+        HttpURLConnection connection = NetUtils.setupConnectionWithRedirectsTo(uriString, checkConstraints);
 
         InputStream inputStream = connection.getInputStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));

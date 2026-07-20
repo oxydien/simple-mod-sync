@@ -3,6 +3,7 @@ package dev.oxydien.simpleModSync.mixin;
 import dev.oxydien.simpleModSync.SimpleModSync;
 import dev.oxydien.simpleModSync.config.Config;
 import dev.oxydien.simpleModSync.ui.ProgressHelper;
+import dev.oxydien.simpleModSync.ui.modals.CurseforgeConstraintsModalHandler;
 import dev.oxydien.simpleModSync.ui.screens.InitScreen;
 import dev.oxydien.simpleModSync.ui.widgets.TotalSyncProgress;
 import dev.oxydien.simpleModSync.ui.widgets.TotalSyncStatus;
@@ -26,6 +27,11 @@ public class TitleScreenMixin extends Screen {
     private void simple_mod_sync$initHead(CallbackInfo ci) {
         if (!Config.instance.hasVisitedInitScreen()) {
             Minecraft.getInstance().setScreen(new InitScreen());
+            ci.cancel();
+        }
+        if (!Config.instance.hasVisitedCurseforgeConstraints()) {
+            CurseforgeConstraintsModalHandler.open(this);
+            Config.instance.setHasVisitedCurseforgeConstraints(true);
             ci.cancel();
         }
     }

@@ -115,5 +115,13 @@ public class Config {
         this.values.getSeenConfig().setAllowGameNeedsRestartPopups(allowed);
         this.save();
     }
+
+    public boolean hasVisitedCurseforgeConstraints() {
+        return this.values.getSeenConfig().hasVisitedCurseforgeConstraints();
+    }
+    public void setHasVisitedCurseforgeConstraints(boolean hasVisited) {
+        this.values.getSeenConfig().setHasVisitedCurseforgeConstraints(hasVisited);
+        this.save();
+    }
     //endregion
 }
