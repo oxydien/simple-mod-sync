@@ -434,6 +434,9 @@ Each modification needs:
 - `pattern` - A regex pattern that matches files to modify
 - `path` - Where to look for files (usually `"."` for the game directory)
 
+Optionally you can also add:
+- `when` - When does this modification get executed (Allowed values: *pre-sync*, *after-sync*. Defaults to *after-sync*)
+
 **Warning:** Regex patterns can be complex. If you're not familiar with regex, use the examples below and test carefully!
 
 ### Remove Files

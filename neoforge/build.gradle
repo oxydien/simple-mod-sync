@@ -37,4 +37,8 @@ neoForge {
     }
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
 sourceSets.main.resources { srcDir 'src/generated/resources' }

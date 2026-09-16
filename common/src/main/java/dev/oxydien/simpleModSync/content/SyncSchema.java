@@ -2,12 +2,18 @@ package dev.oxydien.simpleModSync.content;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import dev.oxydien.simpleModSync.HandlerRegistry;
+import dev.oxydien.simpleModSync.SimpleModSync;
 import dev.oxydien.simpleModSync.exception.JsonValidationException;
+import dev.oxydien.simpleModSync.log.Log;
 import dev.oxydien.simpleModSync.modification.Modification;
+import dev.oxydien.simpleModSync.modification.ModificationTiming;
+import dev.oxydien.simpleModSync.modification.handler.ModificationHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 public class SyncSchema {
@@ -97,6 +103,47 @@ public class SyncSchema {
         return modifications;
     }
 
+
+    public static List<ModificationWork> getModificationsWork(List<Integer> indexesToCheck, Map<Integer, JsonObject> modifications) {
+        HandlerRegistry registry = SimpleModSync.getInstance().Handlers;
+
+        List<ModificationWork> out = new ArrayList<>();
+
+        for (Integer index : indexesToCheck) {
+            JsonObject modObject = modifications.get(index);
+            if (modObject == null) {
+                continue;
+            }
+
+            if (!modObject.has("type") || !modObject.get("type").isJsonPrimitive()) {
+                Log.warning("Failed to parse modification on index", index, ": No valid type specified");
+                continue;
+            }
+            String type = modObject.get("type").getAsString();
+
+            ModificationHandler<?> handler = registry.getModificationHandler(type);
+            if (handler == null) {
+                Log.warning("Failed to run modification on index", index, ": Unsupported type specified", type);
+                continue;
+            }
+
+            try {
+                Modification mod = handler.ParseJson(modObject);
+                out.add(new ModificationWork(index, handler, mod));
+            } catch (Exception e) {
+                Log.error("Failed to parse modification on index", index, e);
+            }
+        }
+
+        return out;
+    }
+
     public record SyncWork(List<Integer> contentsToCheck, List<Integer> modificationsToExecute) {
+    }
+
+    public record ModificationWork(Integer index, ModificationHandler<?> handler, Modification mod) {
+        public ModificationTiming timing() {
+            return mod.getTiming();
+        }
     }
 }

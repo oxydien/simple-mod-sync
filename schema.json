@@ -76,6 +76,13 @@
             "type": "string"
           }
         },
+        "when": {
+          "type": "string",
+          "examples": [
+            "after-sync",
+            "pre-sync"
+          ]
+        },
         "required": ["type", "pattern", "path"]
       }
     }

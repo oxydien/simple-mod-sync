@@ -1,0 +1,20 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxydien/simple-mod-sync/refs/heads/main/schema.json",
+  "$comment": "TO USE THIS: https://raw.githubusercontent.com/oxydien/simple-mod-sync/refs/heads/main/tests/shemaFiles/modifications.json",
+  "sync_version": 3,
+  "sync": [ ],
+  "modify": [
+    {
+      "type": "remove",
+      "pattern": "^logs/debug.log$",
+      "path": "."
+    },
+    {
+      "type": "rename",
+      "pattern": "^latest\\.log$",
+      "path": "logs",
+      "result": "../not_so_latest.log",
+      "when": "pre-sync"
+    }
+  ]
+}
