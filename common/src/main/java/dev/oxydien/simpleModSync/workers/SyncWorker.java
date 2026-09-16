@@ -11,7 +11,7 @@ import dev.oxydien.simpleModSync.content.SyncSchema;
 import dev.oxydien.simpleModSync.content.SyncStatus;
 import dev.oxydien.simpleModSync.content.handler.ContentHandler;
 import dev.oxydien.simpleModSync.log.Log;
-import dev.oxydien.simpleModSync.modification.Modification;
+import dev.oxydien.simpleModSync.modification.ModificationTiming;
 import dev.oxydien.simpleModSync.modification.handler.ModificationHandler;
 import dev.oxydien.simpleModSync.utils.DownloadUtils;
 
@@ -37,6 +37,8 @@ public class SyncWorker implements Runnable {
     private final ExecutorService virtualThreadExecutor;
     private final AtomicReference<SyncStatus> syncStatus = new AtomicReference<>(new SyncStatus());
     private final AtomicReference<List<SyncWorkerUpdateCallback>> updateCallback = new AtomicReference<>();
+    private final AtomicBoolean hasParsedModifications = new AtomicBoolean(false);
+    private final CopyOnWriteArrayList<SyncSchema.ModificationWork> modificationWorks = new CopyOnWriteArrayList<>();
 
     public SyncWorker(SyncSchema schema) {
         this.schema = schema;
@@ -77,11 +79,13 @@ public class SyncWorker implements Runnable {
             this.extractContentObjects(rootObject);
             this.extractModificationObjects(rootObject, work.modificationsToExecute());
 
+            this.processModifications(work.modificationsToExecute(), ModificationTiming.PreSync);
+
             this.changeStatus(SyncStatus.OfState(SyncStatus.SyncState.DOWNLOADING));
 
             this.processAllContent();
 
-            this.processModifications(work.modificationsToExecute());
+            this.processModifications(work.modificationsToExecute(), ModificationTiming.AfterSync);
 
             this.finish();
         } catch (IOException e) {
@@ -187,34 +191,22 @@ public class SyncWorker implements Runnable {
         worker.Process(contentObject, handler, index);
     }
 
-    private void processModifications(List<Integer> integers) {
-        HandlerRegistry registry = SimpleModSync.getInstance().Handlers;
+    private void processModifications(List<Integer> integers, ModificationTiming timing) {
+        if (!hasParsedModifications.get()) {
+            this.modificationWorks.clear();
+            this.hasParsedModifications.set(true);
+            this.modificationWorks.addAll(SyncSchema.getModificationsWork(integers, this.modificationObjects));
+        }
+        List<SyncSchema.ModificationWork> relevant = this.modificationWorks.stream().filter(m -> m.timing() == timing).toList();
+        Log.debug("Running", relevant.size(), timing, "modifications");
 
-        Log.debug("Running", integers.size(), "modifications");
-
-        for (Integer index : integers) {
-            JsonObject modObject = modificationObjects.get(index);
-            if (modObject == null) {
-                return;
-            }
-
-            if (!modObject.has("type") || !modObject.get("type").isJsonPrimitive()) {
-                Log.warning("Failed to run modification on index", index, ": No valid type specified");
-                return;
-            }
-            String type = modObject.get("type").getAsString();
-
-            ModificationHandler handler = registry.getModificationHandler(type);
-            if (handler == null) {
-                Log.warning("Failed to run modification on index", index, ": Unsupported type specified", type);
-                return;
-            }
-
+        for (var work : relevant) {
+            ModificationHandler handler = work.handler();
             try {
-                Modification mod = handler.ParseJson(modObject);
-                handler.Execute(mod, SimpleModSync.getInstance().getInstanceDir());
-            } catch (Exception e) {
-                Log.error("Failed to run modification on index", index, e);
+                handler.Execute(work.mod(), SimpleModSync.getInstance().getInstanceDir());
+            }
+            catch (Exception e) {
+                Log.error("Failed to run modification on index", work.index(), e);
             }
         }
     }

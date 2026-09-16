@@ -21,7 +21,7 @@ public class RenameModificationHandler extends ModificationHandler<RenameModific
 
         String result  = contentObject.get("result").getAsString();
 
-        return new RenameModification(base.getType(), base.getPattern(), base.getPath(), result);
+        return new RenameModification(base.getType(), base.getTiming(), base.getPattern(), base.getPath(), result);
     }
 
     @Override
