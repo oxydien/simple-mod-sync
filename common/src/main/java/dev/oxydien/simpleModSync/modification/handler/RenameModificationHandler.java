@@ -4,11 +4,12 @@ import com.google.gson.JsonObject;
 import dev.oxydien.simpleModSync.exception.JsonValidationException;
 import dev.oxydien.simpleModSync.modification.Modification;
 import dev.oxydien.simpleModSync.modification.RenameModification;
-import dev.oxydien.simpleModSync.utils.StringUtils;
+import dev.oxydien.simpleModSync.utils.DirUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 public class RenameModificationHandler extends ModificationHandler<RenameModification> {
     @Override
@@ -27,6 +28,8 @@ public class RenameModificationHandler extends ModificationHandler<RenameModific
     @Override
     public void ApplyOn(RenameModification mod, Path filePath) throws IOException {
         Path parent = filePath.getParent();
-        Files.move(filePath, parent.resolve(StringUtils.sanitizeDirectory(mod.getResult())));
+        var targetPath = parent.resolve(mod.getResult());
+        var resultPath = DirUtils.sanizizePath(targetPath);
+        Files.move(filePath, resultPath, StandardCopyOption.REPLACE_EXISTING);
     }
 }

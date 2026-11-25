@@ -19,7 +19,7 @@ public class ZipUtils {
 
             while (entries.hasMoreElements()) {
                 ZipEntry zipEntry = entries.nextElement();
-                Path path = destinationDirectory.resolve(zipEntry.getName());
+                Path path = DirUtils.sanitizePath(destinationDirectory, zipEntry.getName());
 
                 if (zipEntry.isDirectory()) {
                     Files.createDirectories(path);

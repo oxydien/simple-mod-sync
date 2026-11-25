@@ -1,5 +1,6 @@
 package dev.oxydien.simpleModSync.utils;
 
+import dev.oxydien.simpleModSync.SimpleModSync;
 import dev.oxydien.simpleModSync.log.Log;
 import org.jetbrains.annotations.Nullable;
 
@@ -91,7 +92,30 @@ public class DirUtils {
 
             return requestedPath;
         } catch (Exception e) {
-            throw new SecurityException("Invalid path", e);
+            throw new SecurityException("Sanizize: Invalid path", e);
+        }
+    }
+
+    /**
+     * Sanitizes a given path by making sure it is a valid path and does not attempt to traverse outside the SMS instance directory {@link SimpleModSync#getInstanceDir}.
+     * Used so the mod cannot access files outside the base (minecraft) directory.
+     *
+     * @param foundPath The user issued path.
+     * @return The sanitized path.
+     * @throws SecurityException If the path is invalid or attempts to traverse outside the base directory.
+     */
+    public static Path sanizizePath(Path foundPath) {
+        try {
+            Path requestedPath = foundPath.toAbsolutePath().normalize();
+
+            // Check if the requested path starts with the base directory
+            if (!requestedPath.startsWith(SimpleModSync.getInstance().getInstanceDir())) {
+                throw new SecurityException("Path traversal attempt detected");
+            }
+
+            return requestedPath;
+        } catch (Exception e) {
+            throw new SecurityException("Sanizize: Invalid path", e);
         }
     }
 }
